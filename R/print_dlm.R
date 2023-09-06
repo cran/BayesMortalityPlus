@@ -1,7 +1,7 @@
 #' @name print.DLM
 #' @rdname print.DLM
 #'
-#' @title Print Values for DLM fitted models
+#' @title DLM: Print
 #'
 #' @description Print details from a fitted `DLM` or `ClosedDLM` models and returns it invisibly.
 #'
@@ -20,15 +20,13 @@
 #' x = 0:100
 #' Ex = USA2010$Ex.Male[x+1]
 #' Dx = USA2010$Dx.Male[x+1]
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
-#' y = log(qx_t)
+#' y = log(Dx/Ex)
 #'
 #' ## Fitting DLM
 #' fit = dlm(y, M = 100, bn = 20, thin = 1)
 #' print(fit)
 #'
-#' @seealso [print.HP()], [print.BLC()] and [print.PredBLC()] for `HP`, `BLC` or `PredBLC` methods.
+#' @seealso [print.HP()] and [print.BLC()] for `HP` or `BLC` methods.
 #'
 #' @export
 print.DLM <- function(x, ...){
@@ -48,6 +46,7 @@ print.DLM <- function(x, ...){
   catf("")
   catf("Ages fitted:")
   cat(fit$info$ages)
+  catf("")
 }
 
 #' @export

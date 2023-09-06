@@ -2,11 +2,11 @@
 % Please edit documentation in R/heatmap_list.R
 \name{Heatmap.list}
 \alias{Heatmap.list}
-\title{Heatmap for the life expectancy.}
+\title{Heatmap for a set of life tables}
 \usage{
 \method{Heatmap}{list}(
   x,
-  x_lab,
+  x_lab = NULL,
   age = NULL,
   max_age = NULL,
   color = c("red", "white", "blue"),

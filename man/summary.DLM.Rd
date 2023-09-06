@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_dlm.R
 \name{summary.DLM}
 \alias{summary.DLM}
-\title{Summary for DLM fitted models}
+\title{DLM: Summary}
 \usage{
 \method{summary}{DLM}(object, digits = 5, ...)
 }
@@ -28,9 +28,7 @@ USA2010 = USA[USA$Year == 2010,]
 x = 0:100
 Ex = USA2010$Ex.Male[x+1]
 Dx = USA2010$Dx.Male[x+1]
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting DLM
 fit = dlm(y, M = 100, bn = 20, thin = 1)

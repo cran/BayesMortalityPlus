@@ -1,7 +1,7 @@
 #' @name Heatmap.list
 #' @rdname Heatmap.list
 #'
-#' @title Heatmap for the life expectancy.
+#' @title Heatmap for a set of life tables
 #'
 #' @description This function plots a heatmap for the life expectancy of the mortality graduations
 #'  returned by hp(), dlm(), hp_close() or dlm_close() functions.
@@ -50,10 +50,14 @@
 #' @import ggplot2
 #' @export
 #'
-Heatmap.list <- function(x, x_lab, age = NULL, max_age = NULL,
+Heatmap.list <- function(x, x_lab = NULL, age = NULL, max_age = NULL,
                          color = c("red","white","blue"), ...){
 
    fits = x
+   if(is.null(x_lab)){
+     x_lab <- rep(NA_character_,length(fits))
+     for(i in 1:length(x_lab)){x_lab[i] <- paste("Fit",as.character(i))}
+    }
    #sanity check:
    if(inherits(fits, "list")){
      if(length(fits) != length(x_lab)){stop("Number of fitted models is different of the x_lab's length.")}
@@ -65,24 +69,18 @@ Heatmap.list <- function(x, x_lab, age = NULL, max_age = NULL,
   if(is.null(age)){
     check = unlist(lapply(fits, class)) %in% c("DLM", "ClosedDLM")
     if(all(check)){
-      ages = rep(NA, length(check))
-      for(i in 1:length(check)){
-        ages[i] = length(fits[[i]]$info$ages)
-      }
+      ages = rep(NA_real_, length(check))
+      for(i in 1:length(check)){ages[i] = length(fits[[i]]$info$ages)}
       age = fits[[which.min(ages)]]$info$ages
     }else if(!any(check)){
-        age = 0:90
+      age = 0:90
     }else{
       dlm_id <- seq(1:length(check))[check]
-      ages = rep(NA, length(dlm_id))
-      for(i in dlm_id){
-        ages[i] = length(fits[[i]]$info$ages)
-      }
-
+      ages = rep(NA_real_, length(dlm_id))
+      for(i in dlm_id){ages[i] = length(fits[[i]]$info$ages)}
       age = fits[[which.min(ages)]]$info$ages
     }
   }
-   ###testar se plota heatmaps
 
    #calculating life expectancy
    if( any(unlist(lapply(fits, class)) %in% c("ClosedHP","ClosedDLM")) ){
@@ -91,23 +89,17 @@ Heatmap.list <- function(x, x_lab, age = NULL, max_age = NULL,
      }
      lista_exp <- lapply(fits, expectancy, graph = FALSE, age = age)
      exps = NULL
-     for(i in 1:length(lista_exp)){
-       exps <- rbind(exps,lista_exp[[i]])
-     }
+     for(i in 1:length(lista_exp)){exps <- rbind(exps,lista_exp[[i]])}
    }else{
      if(is.null(max_age)){max_age = 110}
      lista_exp <- lapply(fits, expectancy, graph = FALSE, age = age, max_age = max_age)
      exps = NULL
-     for(i in 1:length(lista_exp)){
-       exps <- rbind(exps,lista_exp[[i]])
-     }
+     for(i in 1:length(lista_exp)){exps <- rbind(exps,lista_exp[[i]])}
    }
    #creating heatmap dataframe
    exp <- exps$Expectancy
    ano <- c()
-   for(i in 1:length(x_lab)){
-     ano <- c((rep(x_lab[i],length(age))),ano)
-   }
+   for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
    idade <- exps$Age
    df <- data.frame(
      "age" = idade,

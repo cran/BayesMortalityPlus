@@ -1,7 +1,7 @@
 #' @name Heatmap.HP
 #' @rdname Heatmap.HP
 #'
-#' @title HP Model: Heatmap for the life expectancy.
+#' @title HP: Heatmap for the life expectancy
 #'
 #' @description This function plots a heatmap for the life expectancy of the fitted HP models.
 #'
@@ -40,40 +40,29 @@
 #' @import ggplot2
 #' @export
 #'
-Heatmap.HP <- function(x, x_lab, age = 0:90, max_age = 110,
+Heatmap.HP <- function(x, x_lab = NULL, age = 0:90, max_age = 110,
                        color = c("red","white","blue"), ...){
   fits = x
-  #checks de integridade:
-  if(max(age) > max_age){
-    stop("Invalid age interval. Check the max_age argument")
-  }
-
+  if(is.null(x_lab)){x_lab <- "Fitted model"}
+  #sanity check:
+  if(max(age) > max_age){stop("Invalid age interval. Check the max_age argument")}
   if(length(color) != 3){stop("The argument color must be a 3 length vector.")}
 
-  #calculando a exp_vida
-  # if(class(fits) == "list"){
-  #   lista_exp <- lapply(fits, expectancy, graph = FALSE, age = age, max_age = max_age)
-  #   exps = NULL
-  #   for(i in 1:length(lista_exp)){
-  #     exps <- rbind(exps,lista_exp[[i]])
-  #   }
-  # }else{
-    exps <- expectancy(fits, graph = FALSE, age = age, max_age = max_age)
-  #}
+  #calculating life expectancy
+  exps <- expectancy(fits, graph = FALSE, age = age, max_age = max_age)
 
-  #criando dataframe para heatmap:
+
+  #creating dataframe for the heatmap:
   exp <- exps$Expectancy
   ano <- c()
-  for(i in 1:length(x_lab)){
-    ano <- c((rep(x_lab[i],length(age))),ano)
-  }
+  for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
   idade <- exps$Age
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),
     "exp" = exp)
 
-  #plotando heatmap
+  #plot
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +
@@ -93,28 +82,28 @@ Heatmap.HP <- function(x, x_lab, age = 0:90, max_age = 110,
 
 #' @export
 #'
-Heatmap.ClosedHP <- function(x, x_lab, age = 0:90,
+Heatmap.ClosedHP <- function(x, x_lab = NULL, age = 0:90,
                              color = c("red","white","blue"), ...){
   fits = x
-  #checks de integridade:
+  if(is.null(x_lab)){x_lab <- "Fitted model"}
+
+  #sanity check:
   if(length(color) != 3){stop("The argument color must be a 3 length vector.")}
 
-  #calculando a exp_vida
+  #calculating life expectancy
   exps <- expectancy(fits, graph = FALSE, age = age)
 
-  #criando dataframe para heatmap:
+  #creating dataframe for the heatmap:
   exp <- exps$Expectancy
   ano <- c()
-  for(i in 1:length(x_lab)){
-    ano <- c((rep(x_lab[i],length(age))),ano)
-  }
+  for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
   idade <- exps$Age
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),
     "exp" = exp)
 
-  #plotando heatmap
+  #plot
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +

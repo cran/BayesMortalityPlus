@@ -1,7 +1,7 @@
 #' @name plot.list
 #' @rdname plot.list
 #'
-#' @title Plot a set of life tables.
+#' @title Plot a set of life tables
 #'
 #' @description
 #' Function that returns a log-scale 'ggplot' of the mortality graduation
@@ -54,7 +54,6 @@
 #'      plotIC = FALSE, colors = c("red", "blue", "green", "purple"),
 #'      labels = c("HP", "DLM", "ClosedHP", "ClosedDLM"))
 #'
-#' @include qx_ci.R
 #' @include fitted_dlm.R
 #' @include fitted_hp.R
 #' @include fun_aux.R
@@ -103,9 +102,9 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
 
           fits[[i]]$qx = fits[[i]]$qx[,aux[[i]]]
 
-          fits[[i]]$info$y = fits[[i]]$info$y[aux[[i]]]
+          fits[[i]]$info$y = c(fits[[i]]$info$y[aux[[i]]])
           fits[[i]]$info$ages = fits[[i]]$info$ages[aux[[i]]]
-          data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = exp(fits[[i]]$info$y))
+          data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = 1-exp(-exp(fits[[i]]$info$y)))
         }else{
           if(min(aux2) < min(fits[[i]]$info$ages)) { warn = T }
           ages_new[[i]] = aux2[aux2 >= min(fits[[i]]$info$ages)]
@@ -119,9 +118,9 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
           fits[[i]]$mu = fits[[i]]$mu[,aux[[i]]]
           fits[[i]]$beta = fits[[i]]$beta[,aux[[i]]]
 
-          fits[[i]]$info$y = fits[[i]]$info$y[aux[[i]]]
+          fits[[i]]$info$y = c(fits[[i]]$info$y[aux[[i]]])
           fits[[i]]$info$ages = fits[[i]]$info$ages[aux[[i]]]
-          data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = exp(fits[[i]]$info$y))
+          data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = 1-exp(-exp(fits[[i]]$info$y)))
         }
       }
       if(warn){ warning("There are ages especified smaller than the ones in DLM fitted. These ages will not be used.") }
@@ -130,21 +129,23 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
 
     ####################################################################################
 
-    ## qx fit and ic
+    ## qx fit and ci
     qx_fit = qx_cin = n_aux = NULL
     for(i in 1:n_models){
-      aux1 = fitted(fits[[i]], age = age[[i]])
-      aux2 = qx_ci(fits[[i]], age = age[[i]], Ex = Ex, prob = prob)
+      aux = fitted(fits[[i]], age = age[[i]], Ex = Ex, prob = prob)
       if(h[i] > 0) {
         qx_pred <- predict(fits[[i]], h = h[i])
-        aux_last_age = max(aux1$age)
-        aux_qx_fit = c(aux1$qx_fitted, qx_pred$qx_fitted)
-        aux_qi_fit = c(aux2$qi, qx_pred$qx_inf)
-        aux_qs_fit = c(aux2$qs, qx_pred$qx_sup)
-        aux1 = data.frame(age = c(aux1$age, (aux_last_age+1):(aux_last_age+h[i])),
+        aux_last_age = max(aux$age)
+        aux_qx_fit = c(aux$qx_fitted, qx_pred$qx_fitted)
+        aux_qi_fit = c(aux$qi, qx_pred$qx_inf)
+        aux_qs_fit = c(aux$qs, qx_pred$qx_sup)
+        aux1 = data.frame(age = c(aux$age, (aux_last_age+1):(aux_last_age+h[i])),
                           qx_fitted = aux_qx_fit)
-        aux2 = data.frame(age = c(aux2$age, (aux_last_age+1):(aux_last_age+h[i])),
+        aux2 = data.frame(age = c(aux$age, (aux_last_age+1):(aux_last_age+h[i])),
                           qi = aux_qi_fit, qs = aux_qs_fit)
+      }else{
+        aux1 = data.frame(age = aux$age, qx_fitted = aux$qx_fitted)
+        aux2 = data.frame(age = aux$age, qi = aux$qi, qs = aux$qs)
       }
       qx_fit <- rbind(qx_fit, aux1)
       qx_cin <- rbind(qx_cin, aux2)
@@ -212,7 +213,7 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
         new_colors = colors
       }
     }
-    ## Life table's lower limit:
+    ## lower limit:
     limits_y <- decimal(min(c(qx_cin$qi[qx_cin$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
 
     ## Plot base:
@@ -220,7 +221,7 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
       ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(limits_y,0),
                                   limits = 10^-c(limits_y,0), labels = scales::comma) +
       ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-      ggplot2::xlab("Age") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+      ggplot2::xlab("Age") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
       ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                      axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                      axis.title.y = ggplot2::element_text(color = 'black', size = 12),

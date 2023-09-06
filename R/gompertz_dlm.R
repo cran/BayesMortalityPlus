@@ -1,5 +1,4 @@
-#### FUNCAO SIR
-### FALTOU OS Y RESTANTES DOS DADOS
+#### SIR function
 
 sir_gompertz_dlm <- function(fit, data, resampling_size = nrow(fit$mu)){
 
@@ -9,20 +8,20 @@ sir_gompertz_dlm <- function(fit, data, resampling_size = nrow(fit$mu)){
     sigma = sqrt(median(fit$sig2))
 
     likelihood <- function(par){
-      gomp = par[1]*exp(par[2]*data$x)     #### dlm usa normalidade
+      gomp = par[1]*exp(par[2]*data$x)     #### normality in DLM
       prod(dnorm(y, mean = log(gomp), sd = sigma))
     }
 
-  ### Método SIR
+  ### SIR method
 
-  ## sampling A e B
+  ## sampling A and B
   A = rbeta(500, 1, 10000)
   B = rbeta(500, 1, 10)
 
-  ## Distribuição conjunta
+  ## Joint distribution
   df = data.frame(A = rep(A, each = 500), B = rep(B, times = 500))
 
-  ## Assumindo prioris uniformes, logo, distribuição a posteriori é proporcional a verossimilhança
+  ## Assuming uniform priori, posteriori distribution is proportional to the likelihood
   post.dist <- apply(df, 1, likelihood)
 
   pesos = post.dist/(dbeta(df[,1], 1, 10000)*dbeta(df[,2], 1, 10))

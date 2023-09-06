@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_dlm.R
 \name{plot.DLM}
 \alias{plot.DLM}
-\title{DLM: Plot the life table.}
+\title{DLM: Plot the life table}
 \usage{
 \method{plot}{DLM}(
   x,
@@ -47,9 +47,7 @@ USA1990 = USA[USA$Year == 1990,]
 x = 0:100
 Ex = USA1990$Ex.Male[x+1]
 Dx = USA1990$Dx.Male[x+1]
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting DLM
 fit = dlm(y, ages = 0:100, M = 100, bn = 20, thin = 1)

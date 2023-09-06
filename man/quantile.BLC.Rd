@@ -2,7 +2,7 @@
 % Please edit documentation in R/quantile_blc.R
 \name{quantile.BLC}
 \alias{quantile.BLC}
-\title{Sample Quantiles for BLC fitted models}
+\title{BLC: Sample quantiles}
 \usage{
 \method{quantile}{BLC}(x, q, name, ...)
 }
@@ -27,7 +27,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Parameters' median and quantiles 0.05, 0.95
 quantile(fit, c(0.05, 0.5, 0.95), "alpha")

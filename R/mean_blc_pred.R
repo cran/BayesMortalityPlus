@@ -1,7 +1,7 @@
 #' @name mean.PredBLC
 #' @rdname mean.PredBLC
 #'
-#' @title Arithmetic Mean for Predictions
+#' @title BLC: Arithmetic mean for predictions
 #'
 #' @description Calculates the means based on the resulting chains from a predicted year.
 #'
@@ -17,7 +17,7 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Prediction for 2 years ahead
 #' pred = predict(fit, h = 2)

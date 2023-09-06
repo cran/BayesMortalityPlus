@@ -1,7 +1,7 @@
 #' @name Heatmap.DLM
 #' @rdname Heatmap.DLM
 #'
-#' @title DLM: Heatmap for the life expectancy.
+#' @title DLM: Heatmap for the life expectancy
 #'
 #' @description This function plots a heatmap for the life expectancy of the fitted DLMs.
 #'
@@ -25,10 +25,7 @@
 #'
 #' ExF = USA2010$Ex.Female[1:91]
 #' DxF = USA2010$Dx.Female[1:91]
-#'
-#' qx_tF <- DxF/ExF
-#' qx_tF <- 1 - exp(-qx_tF)
-#' yF <- log(qx_tF)
+#' yF = log(DxF/ExF)
 #'
 #' fitF <- dlm(yF, M = 100, bn = 20, thin = 1)
 #'
@@ -44,15 +41,14 @@
 #' @import ggplot2
 #' @export
 #'
-Heatmap.DLM <- function(x, x_lab, age = NULL, max_age = 110,
+Heatmap.DLM <- function(x, x_lab = NULL, age = NULL, max_age = 110,
                         color = c("red","white","blue"), ...){
   fits = x
   if(is.null(age)){age = fits$info$ages}
-  #sanity check:
-  if(max(age) > max_age){
-    stop("Invalid age interval. Check the max_age argument")
-  }
+  if(is.null(x_lab)){x_lab <- "Fitted model"}
 
+  #sanity check:
+  if(max(age) > max_age){stop("Invalid age interval. Check the max_age argument")}
   if(length(color) != 3){stop("The argument color must be a 3 length vector.")}
 
 
@@ -62,9 +58,7 @@ Heatmap.DLM <- function(x, x_lab, age = NULL, max_age = 110,
   #creating dataframe for the heatmap:
   exp <- exps$Expectancy
   ano <- c()
-  for(i in 1:length(x_lab)){
-    ano <- c((rep(x_lab[i],length(age))),ano)
-  }
+  for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
   idade <- exps$Age
   df <- data.frame(
     "age" = idade,
@@ -90,15 +84,14 @@ Heatmap.DLM <- function(x, x_lab, age = NULL, max_age = 110,
 
 
 #' @export
-Heatmap.ClosedDLM <- function(x, x_lab, age = NULL,
+Heatmap.ClosedDLM <- function(x, x_lab = NULL, age = NULL,
                               color = c("red","white","blue"), ...){
   fits = x
-  #sanity check:
+  if(is.null(x_lab)){x_lab <- "Fitted model"}
   if(is.null(age)){age = fits$info$ages}
-  if(max(age) > max(fits$info$ages)){
-    stop("Invalid age interval. Check the max_age argument")
-  }
 
+  #sanity check:
+  if(max(age) > max(fits$info$ages)){stop("Invalid age interval. Check the max_age argument")}
   if(length(color) != 3){stop("The argument color must be a 3 length vector.")}
 
   #calculating the life expectancy
@@ -108,9 +101,7 @@ Heatmap.ClosedDLM <- function(x, x_lab, age = NULL,
   exp <- exps$Expectancy
   idade <- exps$Age
   ano <- c()
-  for(i in 1:length(x_lab)){
-    ano <- c((rep(x_lab[i],length(age))),ano)
-  }
+  for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),

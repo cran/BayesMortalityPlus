@@ -1,7 +1,7 @@
 #' @name plot.PredBLC
 #' @rdname plot.PredBLC
 #'
-#' @title Plot the log-mortality of a prediction
+#' @title BLC: Plot the log-mortality of a prediction
 #'
 #' @description This functions plot the predicted log-mortality and the predict
 #' intervals of the log-mortality for a specific year in the prediction horizon
@@ -9,7 +9,7 @@
 #'
 #' @param x A `PredBLC` object, result to the pred() function call on a `BLC` object.
 #' @param h A numeric vector specifying the year(s) in the prediction horizon to be calculated.
-#' @param cred A real number that represents the probability of the predict interval.
+#' @param prob A real number that represents the probability of the predict interval.
 #' @param plotIC Logical. If 'TRUE' (default), shows the predictive intervals.
 #' @param age A numeric vector indicating the modelled ages. (Optional).
 #' @param ... Other arguments.
@@ -22,14 +22,14 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' #' ## Prediction for 10 years ahead
 #' pred = predict(fit, h = 3)
 #'
 #' ## Plotting
 #' plot(pred, h = 1)
-#' \donttest{plot(pred, h = 3, cred = 0.9)}
+#' \donttest{plot(pred, h = 3, prob = 0.9)}
 #'
 #' @seealso [plot.HP()], [plot.DLM()] and [plot.BLC] for `HP`, `DLM` or `BLC` methods.
 #'
@@ -37,11 +37,11 @@
 #' @import scales
 #'
 #' @export
-plot.PredBLC <- function(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL,
+plot.PredBLC <- function(x, h = NULL, prob = 0.95, plotIC = TRUE, age = NULL,
                          ...) {
 
   obj = x
-  alpha <- 1 - cred
+  alpha <- 1 - prob
 
   if(is.null(h))	{ h <- dim(obj$y)[2] }
   if(any(h > dim(obj$y)[2]))	{ stop("h has invalid values.") }
@@ -65,9 +65,9 @@ plot.PredBLC <- function(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL,
     if(plotIC){
       ggplot2::ggplot(data = NULL) +
         ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(20,0),
-                                    limits = 10^-c(NA,0), labels = scales::comma) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-        ggplot2::xlab("x (index)") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+                                    limits = 10^-c(NA_real_,0), labels = scales::comma) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA_real_, NA_real_)) +
+        ggplot2::xlab("x (index)") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
         ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                        axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                        axis.title.y = ggplot2::element_text(color = 'black', size = 12),
@@ -79,9 +79,9 @@ plot.PredBLC <- function(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL,
     }else{
       ggplot2::ggplot(data = NULL) +
         ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(20,0),
-                                    limits = 10^-c(NA,0), labels = scales::comma) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-        ggplot2::xlab("x (index)") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+                                    limits = 10^-c(NA_real_,0), labels = scales::comma) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA_real_, NA_real_)) +
+        ggplot2::xlab("x (index)") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
         ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                        axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                        axis.title.y = ggplot2::element_text(color = 'black', size = 12),
@@ -101,9 +101,9 @@ plot.PredBLC <- function(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL,
     if(plotIC){
       ggplot2::ggplot(data = df_res) +
         ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(20,0),
-                                    limits = 10^-c(NA,0), labels = scales::comma) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-        ggplot2::xlab("x (index)") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+                                    limits = 10^-c(NA_real_,0), labels = scales::comma) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA_real_, NA_real_)) +
+        ggplot2::xlab("x (index)") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
         ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                        axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                        axis.title.y = ggplot2::element_text(color = 'black', size = 12),
@@ -115,9 +115,9 @@ plot.PredBLC <- function(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL,
     }else{
       ggplot2::ggplot(data = df_res) +
         ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(20,0),
-                                    limits = 10^-c(NA,0), labels = scales::comma) +
-        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-        ggplot2::xlab("x (index)") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+                                    limits = 10^-c(NA_real_,0), labels = scales::comma) +
+        ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA_real_, NA_real_)) +
+        ggplot2::xlab("x (index)") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
         ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                        axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                        axis.title.y = ggplot2::element_text(color = 'black', size = 12),

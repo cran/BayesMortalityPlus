@@ -1,4 +1,4 @@
-#' @title DLM: Fitting the advanced ages of the life tables.
+#' @title DLM: Fitting the advanced ages of the life tables
 #'
 #' @description This function receives an object of the class `DLM` fitted by the dlm() function
 #' and fits a closing method to expand the life tables dataset to a maximum age argument inputed
@@ -39,10 +39,7 @@
 #' x = 0:100
 #' Ex = USA2010$Ex.Male[x+1]
 #' Dx = USA2010$Dx.Male[x+1]
-#'
-#' qx_t <- Dx/Ex
-#' qx_t <- 1 - exp(-qx_t)
-#' y <- log(qx_t)
+#' y <- log(Dx/Ex)
 #'
 #' fit <- dlm(y, M = 100, bn = 20, thin = 1)
 #'
@@ -53,18 +50,12 @@
 #' x2 = 101:110
 #' Ex2 = USA2010$Ex.Male[x2+1]
 #' Dx2 = USA2010$Dx.Male[x2+1]
-#'
-#' qx2_t <- Dx2/Ex2
-#' qx2_t <- 1 - exp(-qx2_t)
-#' y2 <- log(qx2_t)
+#' y2 <- log(Dx2/Ex2)
 #'
 #' close2 = dlm_close(fit, method = "linear",
 #'                   new_data = y2)
 #'
 #' #### Using the other functions available in the package with the 'ClosedDLM' object:
-#'
-#' ## credible intervals (See "?qx_ci" for more options):
-#' qx_ci(close1)
 #'
 #' ## qx estimation (See "?fitted" in the BayesMortalityPlus package for more options):
 #' fitted(close2)
@@ -89,7 +80,6 @@
 #'[expectancy.DLM()] and [Heatmap.DLM()] for `ClosedDLM` methods to compute and visualise the truncated life expectancy
 #'via [expectancy()] and [Heatmap()] functions.
 #'
-#'[qx_ci()] to compute credible intervals.
 #'
 #' @export
 dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(fit$info$ages),
@@ -131,10 +121,10 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
   if(max_age-age_last_data < 0) {max_age = age_last_data}
 
   ## Completing the data for the closing method:
-  new_data = c(new_data, rep(NA, max_age-age_last_data))
+  new_data = c(new_data, rep(NA_real_, max_age-age_last_data))
 
   ## Checking if the model starts at the age 0:
-  if(min_age != 0){ pre_data = rep(NA, length(1:min_age)) }else{ pre_data = NULL }
+  if(min_age != 0){ pre_data = rep(NA_real_, length(1:min_age)) }else{ pre_data = NULL }
 
   ## Data between 0 and the maximum age:
   full_data = c(pre_data, new_data)
@@ -158,16 +148,20 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
   colnames(closed) = old_x
 
   ## Returns of the function: qx chains, x = min_age, ..., max_age
-  ret = matrix(NA, nrow = num_sim, ncol = max_age + 1)
+  ret = matrix(NA_real_, nrow = num_sim, ncol = max_age + 1)
 
   ## Closing methods
   if(method == "plateau"){
 
-    # gets the death probability of x0 and applies it till max_age
-    for (i in 1:num_sim){
-      sim = rnorm(1, fit$mu[i,x0-min_age+1], sqrt(fit$sig2[i]))
-      closed[i, ] = exp(sim)
-    }
+    #gets the death probability of x0 and applies it till max_age
+    sim <- 1 - exp(-exp(rnorm(num_sim, fit$mu[,x0-min_age+1], sqrt(fit$sig2))))
+    closed <- matrix(sim, num_sim, old_len)
+    colnames(closed) = old_x
+
+    # for (i in 1:num_sim){
+    #   sim = rnorm(1, fit$mu[i,x0-min_age+1], sqrt(fit$sig2[i]))
+    #   closed[i, ] = exp(sim)
+    # }
 
   }else if(method == "linear"){
 
@@ -185,8 +179,9 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
       SIGMApred = sig * RMAT
 
       sim_vals = MASS::mvrnorm(1, mu = pred, Sigma = SIGMApred)
-      closed[i, ] = exp(sim_vals)
+      closed[i, ] = 1 - exp(-exp(sim_vals))
     }
+
   ####################################################################################################
   }else if(method == "gompertz"){
 
@@ -194,7 +189,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
 
     for (i in 1:num_sim){
       gomp = param[i,1]*exp(param[i,2]*old_x)
-      sim = exp(rnorm(old_len, log(gomp), sqrt(fit$sig2[i])))
+      sim = 1 - exp(-exp(rnorm(old_len, log(gomp), sqrt(fit$sig2[i]))))
       closed[i, ] = sim
     }
   }
@@ -206,14 +201,14 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
 
   new_age = 0:max_age
   new_len = length(new_age)
-  fitted = matrix(NA, nrow = num_sim, ncol = new_len)
+  fitted = matrix(NA_real_, nrow = num_sim, ncol = new_len)
   colnames(fitted) = new_age
 
   ####################################################################################################
   t = ncol(fit$mu)
   for (i in 1:num_sim){
     sim = rnorm(t, fit$mu[i,], sqrt(fit$sig2[i]))
-    fitted[i, (min_age+1):(t+min_age)] = exp(sim)
+    fitted[i, (min_age+1):(t+min_age)] = 1 - exp(-exp(sim))
   }
   ####################################################################################################
   # Model only indexes: age 0 till x0 - k - 1

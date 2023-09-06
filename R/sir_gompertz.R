@@ -3,7 +3,7 @@ sir_gompertz <- function(fit, data, resampling_size = nrow(fit$post.samples$mcmc
 
   ## Gompertz: gomp = a*exp(b*x)
 
-  ## Verossimilhança
+  ## likelihood
   if(fit$info$model == "binomial"){
 
     sim_Ex = rep(1000, length(data$Ex))
@@ -39,16 +39,16 @@ sir_gompertz <- function(fit, data, resampling_size = nrow(fit$post.samples$mcmc
 
   }
 
-  ### Método SIR
+  ### SIR method
 
-  ## sampling A e B
+  ## sampling A and B
   A = rbeta(500, 1, 10000)
   B = rbeta(500, 1, 10)
 
-  ## Distribuição conjunta
+  ## Joint distribution
   df = data.frame(A = rep(A, each = 500), B = rep(B, times = 500))
 
-  ## Assumindo prioris uniformes, logo, distribuição a posteriori é proporcional a verossimilhança
+  ## Assuming uniform priori, posteriori distribution is proportional to likelihood
   post.dist <- apply(df, 1, likelihood)
 
   pesos = post.dist/(dbeta(df[,1], 1, 10000)*dbeta(df[,2], 1, 10))

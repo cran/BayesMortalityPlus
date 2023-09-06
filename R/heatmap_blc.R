@@ -1,7 +1,7 @@
 #' @name Heatmap.BLC
 #' @rdname Heatmap.BLC
 #'
-#' @title Draw a Heat Map for BLC or PredBLC fitted models
+#' @title BLC: Heatmap for the life expectancy
 #'
 #' @description Draws a Heat Map based on the life expectancy of a fitted BLC or PredBLC model.
 #'
@@ -21,7 +21,7 @@
 #'
 #' ## Fitting the model
 #'
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Heatmap:
 #' Heatmap(fit, x_lab = 2000:2015, age = 18:80)
@@ -35,9 +35,7 @@ Heatmap.BLC <- function(x, x_lab = NULL, age = NULL, color = c("red","white","bl
   objClass <- class(obj)
   supportedClasses <- c("BLC")
 
-  if (!any(objClass %in% supportedClasses)) {
-    stop("Invalid object type")
-  }
+  if(!any(objClass %in% supportedClasses)){stop("Invalid object type")}
 
   L <- ncol(obj$Y)
   q <- nrow(obj$Y)
@@ -53,11 +51,9 @@ Heatmap.BLC <- function(x, x_lab = NULL, age = NULL, color = c("red","white","bl
     rows <- age
   }else{rows <- 1:q}
 
-  exps2 <- as.data.frame(matrix(NA, nrow = q*L, ncol = 3))
+  exps2 <- as.data.frame(matrix(NA_real_, nrow = q*L, ncol = 3))
   colnames(exps2) <- c("Exp","Year","Age")
-  for(j in 1:L){
-  	exps2[(q*j-(q-1)):(q*j),] <- data.frame(exps[,j],rep(tag[j]),as.numeric(rows))
-  }
+  for(j in 1:L){exps2[(q*j-(q-1)):(q*j),] <- data.frame(exps[,j],rep(tag[j]),as.numeric(rows))}
   midp <- mean(exps)
 
   p <- ggplot(exps2) + theme_light() +
@@ -81,9 +77,7 @@ Heatmap.PredBLC <- function(x, x_lab = NULL, age = NULL, color = c("red","white"
   objClass <- class(obj)
   supportedClasses <- c("PredBLC")
 
-  if (!any(objClass %in% supportedClasses)) {
-    stop("Invalid object type")
-  }
+  if(!any(objClass %in% supportedClasses)){stop("Invalid object type")}
 
   L <- obj$h
   q <- dim(obj$y)[3]
@@ -99,11 +93,9 @@ Heatmap.PredBLC <- function(x, x_lab = NULL, age = NULL, color = c("red","white"
     rows <- age
     }else{rows <- 1:q}
 
-  exps2 <- as.data.frame(matrix(NA, nrow = q*L, ncol = 3))
+  exps2 <- as.data.frame(matrix(NA_real_, nrow = q*L, ncol = 3))
   colnames(exps2) <- c("Exp","Year","Age")
-  for(j in 1:L){
-    exps2[(q*j-(q-1)):(q*j),] <- data.frame(exps[,j], rep(tag[j]),as.numeric(rows))
-  }
+  for(j in 1:L){exps2[(q*j-(q-1)):(q*j),] <- data.frame(exps[,j], rep(tag[j]),as.numeric(rows))}
   midp <- mean(exps)
 
   p <- ggplot(exps2) + theme_light() +

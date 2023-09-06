@@ -2,7 +2,7 @@
 % Please edit documentation in R/mean_blc_pred.R
 \name{mean.PredBLC}
 \alias{mean.PredBLC}
-\title{Arithmetic Mean for Predictions}
+\title{BLC: Arithmetic mean for predictions}
 \usage{
 \method{mean}{PredBLC}(x, h, ...)
 }
@@ -24,7 +24,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Prediction for 2 years ahead
 pred = predict(fit, h = 2)

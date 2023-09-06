@@ -2,18 +2,18 @@
 % Please edit documentation in R/plot_blc.R
 \name{plot.BLC}
 \alias{plot.BLC}
-\title{Plot of BLC fitted models}
+\title{BLC: Plot the fitted values}
 \usage{
-\method{plot}{BLC}(x, parameter = "all", cred = 0.9, ages = NULL, ...)
+\method{plot}{BLC}(x, parameter = "all", prob = 0.9, age = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{BLC} or \code{PredBLC} object, result of a call to blc() function or forecast via predict() function.}
+\item{x}{A \code{BLC} object, result of a call to blc() function.}
 
-\item{parameter}{A character determines the parameter that will be plotted (\code{BLC} only). Default is "all" which means that all three parameters "alpha", "beta" and "kappa" will be plotted. It can also be "alpha", "beta", "kappa" or "fitted". The last one provides a plot with all the fitted tables.}
+\item{parameter}{A character determines the parameter that will be plotted. Default is "all" which means that all three parameters "alpha", "beta" and "kappa" will be plotted. It can also be "alpha", "beta", "kappa" or "fitted". The last one provides a plot with all the fitted tables.}
 
-\item{cred}{A numeric value that indicates the probability for the credible interval. Default is '0.9'.}
+\item{prob}{A numeric value that indicates the probability for the credible interval. Default is '0.9'.}
 
-\item{ages}{A numeric vector that represents the ages used in the fitted BLC model. Default is 'NULL'.}
+\item{age}{A numeric vector that represents the ages used in the fitted BLC model. Default is 'NULL'.}
 
 \item{...}{Other arguments.}
 }
@@ -29,16 +29,16 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Parameters' plot
 plot(fit, parameter = "all")
-\donttest{plot(fit, parameter = "beta", cred = 0.95)
-plot(fit, parameter = "alpha", ages = 18:80)
+\donttest{plot(fit, parameter = "beta", prob = 0.95)
+plot(fit, parameter = "alpha", age = 18:80)
 plot(fit, parameter = "kappa")
 
 ## Fitted mortality graduation
-plot(fit, parameter = "fitted", ages = 18:80)
+plot(fit, parameter = "fitted", age = 18:80)
 }
 
 }

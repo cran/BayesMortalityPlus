@@ -2,7 +2,7 @@
 % Please edit documentation in R/quantile_blc_pred.R
 \name{quantile.PredBLC}
 \alias{quantile.PredBLC}
-\title{Sample Quantiles for Predictions}
+\title{BLC: Sample quantiles for predictions}
 \usage{
 \method{quantile}{PredBLC}(x, q, h, ...)
 }
@@ -27,7 +27,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Prediction for 2 years ahead
 pred = predict(fit, h = 2)

@@ -2,11 +2,11 @@
 % Please edit documentation in R/heatmap_hp.R
 \name{Heatmap.HP}
 \alias{Heatmap.HP}
-\title{HP Model: Heatmap for the life expectancy.}
+\title{HP: Heatmap for the life expectancy}
 \usage{
 \method{Heatmap}{HP}(
   x,
-  x_lab,
+  x_lab = NULL,
   age = 0:90,
   max_age = 110,
   color = c("red", "white", "blue"),

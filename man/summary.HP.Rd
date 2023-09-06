@@ -2,7 +2,7 @@
 % Please edit documentation in R/summary_hp.R
 \name{summary.HP}
 \alias{summary.HP}
-\title{Summary for HP fitted models}
+\title{HP: Summary}
 \usage{
 \method{summary}{HP}(object, ...)
 }

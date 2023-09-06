@@ -2,14 +2,14 @@
 % Please edit documentation in R/fitted_blc.R
 \name{fitted.BLC}
 \alias{fitted.BLC}
-\title{Fitted values for BLC fitted models}
+\title{BLC: Fitted death probabilities (qx)}
 \usage{
-\method{fitted}{BLC}(object, cred = 0.95, ...)
+\method{fitted}{BLC}(object, prob = 0.95, ...)
 }
 \arguments{
-\item{object}{A \code{BLC} object, result of a call to blc() function.}
+\item{object}{A \code{BLC} or \code{PredBLC} object, result of a call to blc() or predict() function.}
 
-\item{cred}{A real number that indicates the probability of the credible interval.}
+\item{prob}{A real number that indicates the probability of the credible interval.}
 
 \item{...}{Other arguments.}
 }
@@ -27,10 +27,10 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Log-mortalities estimates for each age and year in model fitted
-fitted(fit, cred = 0.95)
+fitted(fit, prob = 0.95)
 
 }
 \seealso{

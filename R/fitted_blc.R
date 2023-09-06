@@ -1,15 +1,15 @@
 #' @name fitted.BLC
 #' @rdname fitted.BLC
 #'
-#' @title Fitted values for BLC fitted models
+#' @title BLC: Fitted death probabilities (qx)
 #'
 #' @description Computes the fitted values associated to each age and year based on
 #' the resulting chains from a fitted BLC model. In addition, this function also
 #' evaluates the values of lower and upper limits of the credible interval.
 #'
 #'
-#' @param object A `BLC` object, result of a call to blc() function.
-#' @param cred A real number that indicates the probability of the credible interval.
+#' @param object A `BLC` or `PredBLC` object, result of a call to blc() or predict() function.
+#' @param prob A real number that indicates the probability of the credible interval.
 #' @param ... Other arguments.
 #'
 #' @return A list with the matrices of fitted values and lower and upper limits of the credible interval for each age and year.
@@ -20,26 +20,26 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Log-mortalities estimates for each age and year in model fitted
-#' fitted(fit, cred = 0.95)
+#' fitted(fit, prob = 0.95)
 #'
 #' @seealso [fitted.HP()] and [fitted.DLM()] for `HP` or `DLM` methods.
 #'
 #' @export
-fitted.BLC <- function(object, cred = 0.95, ...) {
+fitted.BLC <- function(object, prob = 0.95, ...) {
   obj = object
-	N <- obj$numit - obj$warmup
+	N <- obj$M - obj$bn
 	L <- nrow(obj$kappa)
 	q <- nrow(obj$alpha)
 	fits <- array(dim = c(q, L, N))
 
-	for (i in (obj$warmup+1):obj$numit) {
-		fits[ , ,i - obj$warmup] <- obj$alpha[ ,i] + obj$beta[ ,i,drop=F] %*% obj$kappa[ ,i]
+	for (i in (obj$bn+1):obj$M) {
+		fits[ , ,i - obj$bn] <- obj$alpha[ ,i] + obj$beta[ ,i,drop=F] %*% obj$kappa[ ,i]
 	}
 
-	alpha <- 1 - cred
+	alpha <- 1 - prob
 	mean <- apply(fits, c(1,2), mean)
 	upper <- apply(fits, c(1,2), quantile, 1 - alpha/2)
 	lower <- apply(fits, c(1,2), quantile, alpha/2)
@@ -52,19 +52,19 @@ fitted.BLC <- function(object, cred = 0.95, ...) {
 	row.names(upper) <- row.names(obj$Y)
 	row.names(lower) <- row.names(obj$Y)
 
-	list(mean = exp(mean), upper = exp(upper), lower = exp(lower))
+	list(mean = 1 - exp(-exp(mean)), upper = 1 - exp(-exp(upper)), lower = 1 - exp(-exp(lower)))
 }
 
 
 
 #'
 #' @export
-fitted.PredBLC <- function(object, cred = 0.95, ...) {
+fitted.PredBLC <- function(object, prob = 0.95, ...) {
   obj = object
   fits <- obj$y
 
 
-  alpha <- 1 - cred
+  alpha <- 1 - prob
   mean <- apply(fits, c(3,2), mean)
   upper <- apply(fits, c(3,2), quantile, 1 - alpha/2)
   lower <- apply(fits, c(3,2), quantile, alpha/2)
@@ -77,5 +77,5 @@ fitted.PredBLC <- function(object, cred = 0.95, ...) {
   row.names(upper) <- row.names(obj$y)
   row.names(lower) <- row.names(obj$y)
 
-  list(mean = exp(mean), upper = exp(upper), lower = exp(lower))
+  list(mean = 1 - exp(-exp(mean)), upper = 1 - exp(-exp(upper)), lower = 1 - exp(-exp(lower)))
 }

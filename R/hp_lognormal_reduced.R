@@ -1,23 +1,12 @@
 hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NULL, v = NULL,
                          inits = NULL, prop.control = NULL, sigma2 = NULL){
 
-  # x vetor das idades
-  # Ex vetor com as exposições por idade
-  # Dx vetor com as mortes por idade
-  # M é o número de iterações realizada pelo algoritmo
-  # bn é o burn-in (parte da cadeia inicial que é descartada pelo algoritmo)
-  # m é um vetor com as médias dos parâmetros (calculadas pela função do pacote mortalityLaws)
-  # v é um vetor com as variâncias dos parâmetros (pode ser calculada da mesma forma que é feita no script)
-  # inits é um vetor com os chutes iniciais para o MCMC (nesse caso igual a m)
-  # prop.control é um vetor que vai controlar a variância das dist. propostas
-  # sigma2 é valor inicial de sigma2
-
   ##############################################################################################
-  #### Otimização dos parâmetros para chutes iniciais
+  #### optimal value for the inits
   Mx = Dx/Ex
   opt = optim_HP(x = x, Ex, Dx, curve = "8par")
 
-  ## Verificando se o vetor inits foi passado pelo usuário e se foi passado de forma correta
+  ## init validation
   if(is.null(inits)){
 
     inits[1] = opt[1]; inits[2] = opt[2]; inits[3] = opt[3]; inits[4] = opt[4]
@@ -41,36 +30,35 @@ hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m
   sigma2 = ifelse(is.null(sigma2), 0.1, sigma2)
   if(sigma2 <= 0){ stop("Invalid sigma2 value.") }
 
-  a = b = c = 0
+  a = b = c = 0 ## reduced model
   inits[1:3] = 0
 
   ##############################################################################################
-  ### Funções auxiliares
+  ### auxs
 
   mu = function(x, a, b, c, d, e, f, g, h){
-    ### Função que encontra a função HP para uma idade e conjunto de parâmetros específicos
+    ### HP function for specific age and parameters
     media = a^((x+b)^c) + d*exp(-e*(log(x)-log(f))^2) + (g*h^x)
     return(media)
   }
 
-  ### Log-verossimilhança do modelo (sem constantes que não dependem dos parâmetros) para MCMC
+  ### Log-likelihood (MCMC)
   like.HPBayes= function(Ex, Dx, x, a, b, c, d, e, f, g, h, sigma2){
-    ## Calculando a curva hp e a média
+    ## Calculating HP curve and mean
     hp = mu(x, a, b, c, d, e, f, g, h)
-    # mu_mean = log(hp / (1 + hp)) ## Essa notação é usada na função de fechamento, usando essa versão, y = log(qx)
+    # mu_mean = log(hp / (1 + hp)) ## notation used in the closing method, using this y = log(qx) version.
 
-    ## Calculando qx observados nos dados
     qx = 1 - exp(-Dx/Ex)
-    qx[qx < 1e-16] = 1e-16            # evitar erros numéricos com log(qx)
-    qx[qx > 1 - 1e-16] = 1 - 1e-16    # evitar erros numéricos com log(1 - qx)
+    qx[qx < 1e-16] = 1e-16            # avoid numeric error w log(qx)
+    qx[qx > 1 - 1e-16] = 1 - 1e-16    # avoid numeric error w log(1 - qx)
     y = log(qx/(1-qx))                # y ~ normal(log(hp), sigma2)
 
-    ## log-verossimilhança de uma v.a. com dist. normal(mu_mean, sigma2)
+    ## log-likelihood normal(mu_mean, sigma2)
     logvero = sum(-0.5 * ( log(sigma2) + (1/sigma2) * (y - log(hp))^2 ), na.rm = T);
     return(logvero)
   }
 
-  ### Jacobiano das transformações
+  ### Jacobian
   jac_logit = function(x) - log(abs(x - x^2))
   jac_log = function(x) - log(x)
   jac_f = function(x){
@@ -118,15 +106,15 @@ hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m
   ## Posteriori sigma2
   alpha.s2.post <- alpha.s2 + 0.5*length(x)
 
-  ## SD das distribuições propostas (pode ser calibrado para aumentar ou reduzir as taxas de aceitação)
+  ## SD for prop. distributions
   sd = 1*prop.control
 
-  ### Parâmetros para a proposta do bloco (d, e, f, g, h)
+  ### proposed parameters for the block (d, e, f, g, h)
   U = diag(5)
   eps = 1e-10
 
   ##############################################################################################
-  ## Objetos auxiliares
+  ## aux objects
   param = c("A", "B", "C", "D", "E", "F", "G", "H")
   param_problemas = NULL; warn = F
 
@@ -135,32 +123,30 @@ hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m
   qx[qx > 1 - 1e-16] = 1 - 1e-16
   y = log(qx/(1-qx))
 
-  ### Matriz para salvar as cadeias geradas para os parâmetros
-  theta.post = matrix(NA, ncol = 8, nrow = M + 1)
+  theta.post = matrix(NA_real_, ncol = 8, nrow = M + 1)
 
-  ### Inicializando contadores para avaliar as taxas de aceitação
-  ### Taxas consideradas aceitáveis estão entre 20% e 40%
+  ### Acceptance rates
   cont = rep(0, 8)
 
-  ### Chute inicial dado para o algoritmo
+  ### Initial values
   theta.post[1,] = inits
 
-  ## Barra de progresso
+  ## progress bar
   pb  = progress::progress_bar$new(format = "Simulating [:bar] :percent in :elapsed",total = M, clear = FALSE, width = 60)
 
   ##############################################################################################
-  ## Ajuste
+  ## Fits
 
   system.time(for (k in 2:(M+1)) {
 
     pb$tick()
 
-    ##### Geração dos parâmetros ''a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' por bloco (proposta conjunta)
+    ##### 'd', 'e', 'f', 'g', 'h' estimated in one block (joint)
 
-    ### Definindo a matriz de covariâncias da proposta (Metropolis-Hastings Adaptado)
+    ### Covariance matrix (Metropolis-Hastings)
     if(k < 1000){
       V = sd*U
-    }else if(k%%10 == 0) { ### Atualizando a matriz de covariâncias a cada 10 passos (arbitrário)
+    }else if(k%%10 == 0) { ### updating every 10 iterations
       X = theta.post[c((k-1000):(k-1)), 4:8]
       X[,1] = log(X[,1]/(1 - X[,1]))                                      ## D
       X[,2] = log(X[,2])                                                  ## E
@@ -230,9 +216,9 @@ hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m
   if(warn){ warning(paste0("MCMC had some problem with parameter(s): ", paste(sort(unique(param_problemas)), collapse = ", "), ". Try to assign informative prior distributions.")) }
 
   ##############################################################################################
-  ### Objetos retornados pela função
+  ### Return
 
-  #### Cadeias finais
+  ## Final samples
   theta.post = theta.post[seq(bn+1+1, M+1, by = thin),]
   sigma2 = sigma2[seq(bn+1+1, M+1, by = thin)]
 

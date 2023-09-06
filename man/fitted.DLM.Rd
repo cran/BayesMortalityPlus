@@ -4,17 +4,19 @@
 \alias{fitted.DLM}
 \title{DLM: Fitted death probabilities (qx)}
 \usage{
-\method{fitted}{DLM}(object, age = NULL, ...)
+\method{fitted}{DLM}(object, age = NULL, prob = 0.95, ...)
 }
 \arguments{
 \item{object}{Object of the following classes: \code{DLM} or \code{ClosedDLM}.}
 
 \item{age}{Vector with the ages to calculate the death probabilities (Optional). By default, all ages are considered.}
 
+\item{prob}{Coverage probability of the predictive intervals.}
+
 \item{...}{Other arguments.}
 }
 \value{
-A data.frame object with the selected ages and the corresponding death probabilities.
+A data.frame object with the selected ages and the corresponding estimates and predictive intervals of the death probabilities.
 }
 \description{
 This function computes the point estimations of the death probabilities (qx) of a
@@ -29,10 +31,7 @@ USA2000 = USA[USA$Year == 2000,]
 x = 0:100
 Ex = USA2000$Ex.Total[x+1]
 Dx = USA2000$Dx.Total[x+1]
-
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting dlm
 fit = dlm(y, M = 100, bn = 20, thin = 1)

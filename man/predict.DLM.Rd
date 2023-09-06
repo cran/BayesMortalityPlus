@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict_dlm.R
 \name{predict.DLM}
 \alias{predict.DLM}
-\title{Prediction of death probability for a fitted DLM}
+\title{DLM: Prediction of death probability}
 \usage{
 \method{predict}{DLM}(object, h, prob = 0.95, ...)
 }
@@ -32,8 +32,8 @@ x = 0:100
 Ex = USA2000$Ex.Total[x+1]
 Dx = USA2000$Dx.Total[x+1]
 
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
+mx_t = Dx/Ex
+qx_t = 1 - exp(-mx_t)
 y = log(qx_t)
 
 ## Fitting dlm

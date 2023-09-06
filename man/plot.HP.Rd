@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_hp.R
 \name{plot.HP}
 \alias{plot.HP}
-\title{HP Model: Plot the life table.}
+\title{HP: Plot the life table}
 \usage{
 \method{plot}{HP}(
   x,

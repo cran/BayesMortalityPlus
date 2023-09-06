@@ -2,7 +2,7 @@
 % Please edit documentation in R/dlm_close.R
 \name{dlm_close}
 \alias{dlm_close}
-\title{DLM: Fitting the advanced ages of the life tables.}
+\title{DLM: Fitting the advanced ages of the life tables}
 \usage{
 dlm_close(fit, method = c("linear", "gompertz", "plateau"),
           x0 = max(fit$info$ages), max_age = 120, k = 7,
@@ -50,10 +50,7 @@ USA2010 = USA[USA$Year == 2010,]
 x = 0:100
 Ex = USA2010$Ex.Male[x+1]
 Dx = USA2010$Dx.Male[x+1]
-
-qx_t <- Dx/Ex
-qx_t <- 1 - exp(-qx_t)
-y <- log(qx_t)
+y <- log(Dx/Ex)
 
 fit <- dlm(y, M = 100, bn = 20, thin = 1)
 
@@ -64,18 +61,12 @@ close1 = dlm_close(fit, method = "plateau")
 x2 = 101:110
 Ex2 = USA2010$Ex.Male[x2+1]
 Dx2 = USA2010$Dx.Male[x2+1]
-
-qx2_t <- Dx2/Ex2
-qx2_t <- 1 - exp(-qx2_t)
-y2 <- log(qx2_t)
+y2 <- log(Dx2/Ex2)
 
 close2 = dlm_close(fit, method = "linear",
                   new_data = y2)
 
 #### Using the other functions available in the package with the 'ClosedDLM' object:
-
-## credible intervals (See "?qx_ci" for more options):
-qx_ci(close1)
 
 ## qx estimation (See "?fitted" in the BayesMortalityPlus package for more options):
 fitted(close2)
@@ -100,6 +91,4 @@ Dodd, Erengul, Forster, Jonathan, Bijak, Jakub, & Smith, Peter 2018. “Smoothin
 
 \code{\link[=expectancy.DLM]{expectancy.DLM()}} and \code{\link[=Heatmap.DLM]{Heatmap.DLM()}} for \code{ClosedDLM} methods to compute and visualise the truncated life expectancy
 via \code{\link[=expectancy]{expectancy()}} and \code{\link[=Heatmap]{Heatmap()}} functions.
-
-\code{\link[=qx_ci]{qx_ci()}} to compute credible intervals.
 }

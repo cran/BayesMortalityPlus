@@ -1,6 +1,6 @@
 #' Mortality Data from Portugal to be used as example
 #'
-#' Matrix with the logarithm of the probability of death in Portugal's population from 2000 until 2015.
+#' Matrix with the logarithm of the mortality rates in Portugal's population from 2000 until 2015.
 #' The ages vary from 18 to 80 years.
 #'
 #' @format A numeric matrix with 63 rows and 16 columns:

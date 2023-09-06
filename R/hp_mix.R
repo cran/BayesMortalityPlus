@@ -1,4 +1,4 @@
-#' @title HP Model mixture
+#' @title HP: Model mixture
 #'
 #' @description This function mixes the fitted mortality table of the HP model with another mortality
 #' table provided by the user.
@@ -57,7 +57,7 @@ hp_mix <- function(fit, mu_post, weights = NULL, mix_age, x0_prior, x0_post, max
   if(max_age < x0_prior) stop("max_age must be bigger than x0_prior.")
   if(max_age < x0_post) stop("max_age must be bigger than x0_post.")
 
-  ## Verificar se weights foi passado corretamente
+  ## Weights check
   if(is.null(weights)){
     prior_weights = seq(from = 1, to = 0, length.out = mix_age[2] - mix_age[1] + 1)
   }else{
@@ -75,15 +75,21 @@ hp_mix <- function(fit, mu_post, weights = NULL, mix_age, x0_prior, x0_post, max
 
   posterior_weights = 1 - prior_weights
 
-  ## calcula qx das cadeias do fit
+  ## calculating qx
   age_fitted <- x0_prior:max_age
-  mu_prior = matrix(NA, nrow = nrow(fit$post.samples$mcmc_theta), ncol = length(age_fitted))
+  mu_prior = matrix(NA_real_, nrow = nrow(fit$post.samples$mcmc_theta), ncol = length(age_fitted))
   for (i in 1:nrow(mu_prior)){
-    mu_prior[i,] = 1 - exp(-hp_curve_9(age_fitted, fit$post.samples$mcmc_theta[i,]))
-    mu_prior[i,] = ifelse((mu_prior[i,] < 0 | mu_prior[i,] > 1), NA, mu_prior[i,])
+    if(fit$info$model == "lognormal"){
+      mu_prior[i,] = hp_curve(age_fitted, fit$post.samples$mcmc_theta[i,])
+      mu_prior[i,] = mu_prior[i,]/(1 + mu_prior[i,])
+      mu_prior[i,] = ifelse((mu_prior[i,] < 0 | mu_prior[i,] > 1), NA, mu_prior[i,])
+    }else{
+      mu_prior[i,] = 1 - exp(-hp_curve_9(age_fitted, fit$post.samples$mcmc_theta[i,]))
+      mu_prior[i,] = ifelse((mu_prior[i,] < 0 | mu_prior[i,] > 1), NA, mu_prior[i,])
+    }
   }
 
-  ## Mistura
+  ## Mixing
   mix_int = mix_age[1]:mix_age[2] + 1
   for (i in 1:nrow(mu_prior)) {
     mu_prior[i,mix_int-x0_prior] = prior_weights*mu_prior[i,mix_int-x0_prior] + posterior_weights*mu_post[mix_int-x0_post]

@@ -1,24 +1,12 @@
 hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NULL, v = NULL,
                        inits = NULL, prop.control = NULL, K = NULL){
 
-  # x vetor das idades
-  # Ex vetor com as exposições por idade
-  # Dx vetor com as mortes por idade
-  # M é o número de iterações realizada pelo algoritmo
-  # bn é o burn-in (parte da cadeia inicial que é descartada pelo algoritmo)
-  # m é um vetor com as médias dos parâmetros (calculadas pela função do pacote mortalityLaws)
-  # v é um vetor com as variâncias dos parâmetros (pode ser calculada da mesma forma que é feita no script)
-  # inits é um vetor com os chutes iniciais para o MCMC (nesse caso igual a m)
-  # K é o valor real dado para o parametro K da curva HP de 9 parâmetros
-  ## k é tratado de forma fixa, então m, v, inits e prop.control devem ter comprimento 8
-  # prop.control é um vetor que vai controlar a variância das dist. propostas
-
   ##############################################################################################
-  #### Otimização dos parâmetros para chutes iniciais
+  #### optimal value for the inits
   Mx = Dx/Ex
   opt = optim_HP(x = x, Ex, Dx, curve = "9par")
 
-  ## Verificando se o vetor inits foi passado pelo usuário e se foi passado de forma correta
+  ## init validation
   if(is.null(inits)){
 
     inits[1] = opt[1]; inits[2] = opt[2]; inits[3] = opt[3]; inits[4] = opt[4]
@@ -39,32 +27,32 @@ hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NUL
     stop("Initial value(s) outside the range of possible values for the paramater(s).")
   }
 
-  ## Valor de K
+  ## K
   k2 = ifelse(is.null(K), opt[9], K)
 
   ##############################################################################################
-  ### Funções auxiliares
+  ### auxs
 
   mu = function(x, a, b, c, d, e, f, g, h, k){
-    ### Função que encontra a função HP para uma idade e conjunto de parâmetros específicos
+    ### HP function for specific age and parameters
     media = a^((x+b)^c) + d*exp(-e*(log(x)-log(f))^2) + (g*h^x)/(1 + k*g*h^x)
     return(media)
   }
 
-  ### Log-verossimilhança do modelo (sem constantes que não dependem dos parâmetros) para MCMC
+  ### Log-likelihood (MCMC)
   like.HPBayes= function(Ex, Dx, x, a,b,c,d,e,f,g,h,k){
 
     qx = mu(x, a, b, c, d, e, f, g, h, k)
     # qx = 1 - exp(-mx)
-    qx[qx < 1e-16] = 1e-16            # evitar erros numéricos com log(qx)
-    qx[qx > 1 - 1e-16] = 1 - 1e-16    # evitar erros numéricos com log(1 - qx)
+    qx[qx < 1e-16] = 1e-16            # avoid numeric error w log(qx)
+    qx[qx > 1 - 1e-16] = 1 - 1e-16    # avoid numeric error w log(1 - qx)
     # Ex = trunc(Ex)
     # logvero = sum(Dx*log(qx), na.rm = T) + sum((Ex - Dx)*log(1 - qx), na.rm = T)
     logvero = sum(Dx*log(Ex*qx) - Ex*qx, na.rm = T);
     return(logvero)
   }
 
-  ### Jacobiano das transformações
+  ### Jacobian
   jac_logit = function(x) - log(abs(x - x^2))
   jac_log = function(x) - log(x)
   jac_f = function(x){
@@ -107,44 +95,42 @@ hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NUL
   alpha.h = (m[8]^2)/v[8]
   beta.h = m[8]/v[8]
 
-  ## SD das distribuições propostas (pode ser calibrado para aumentar ou reduzir as taxas de aceitação)
+  ## SD for prop. distributions
   sd = 1*prop.control
 
-  ### Parâmetros para a proposta do bloco (a, b, c, d, e, f, g, h)
+  ### proposed parameters for the block (a, b, c, d, e, f, g, h)
   U = diag(8)
   eps = 1e-10
 
   ##############################################################################################
-  ## Objetos auxiliares
+  ## aux objects
   param = c("A", "B", "C", "D", "E", "F", "G", "H", "K")
   param_problemas = NULL; warn = F
 
-  ### Matriz para salvar as cadeias geradas para os parâmetros
-  theta.post = matrix(NA, ncol = 9, nrow = M + 1)
+  theta.post = matrix(NA_real_, ncol = 9, nrow = M + 1)
 
-  ### Inicializando contadores para avaliar as taxas de aceitação
-  ### Taxas consideradas aceitáveis estão entre 20% e 40%
+  ### Acceptance rates
   cont = rep(0, 9)
 
-  ### Chute inicial dado para o algoritmo
+  ### Initial values
   theta.post[1,] = c(inits, k2)
 
-  ## Barra de progresso
+  ## progress bar
   pb  = progress::progress_bar$new(format = "Simulating [:bar] :percent in :elapsed",total = M, clear = FALSE, width = 60)
 
   ##############################################################################################
-  ## Ajuste
+  ## Fits
 
   system.time(for (k in 2:(M+1)) {
 
     pb$tick()
 
-    ##### Geração dos parâmetros ''a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' por bloco (proposta conjunta)
+    ##### ''a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' estimated in one block (joint)
 
-    ### Definindo a matriz de covariâncias da proposta (Metropolis-Hastings Adaptado)
+    ### Covariance matrix (Metropolis-Hastings)
     if(k < 1000){
       V = sd*U
-    }else if(k%%10 == 0) { ### Atualizando a matriz de covariâncias a cada 10 passos (arbitrário)
+    }else if(k%%10 == 0) { ### updating every 10 iterations
       X = theta.post[c((k-1000):(k-1)), 1:8]
       X[,1] = log(X[,1]/(1 - X[,1]))                                      ## A
       X[,2] = log(X[,2]/(1 - X[,2]))                                      ## B
@@ -199,7 +185,7 @@ hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NUL
       theta.post[k,1:8] = theta.post[k-1,1:8]
     }
 
-    theta.post[k,9] = theta.post[k-1,9] ### Optou-se por fixar o parâmetro k no valor estimado pela otimização
+    theta.post[k,9] = theta.post[k-1,9]
 
     limite_inf = which(theta.post[k,] <= c(1e-16, 1e-16, 1e-16, 1e-16, 1e-16, 15+1e-16, 1e-16, 1e-16, -Inf))
     limite_sup = which(theta.post[k,] >= c(1-1e-5, 1-1e-5, 1-1e-5, 1-1e-5, Inf, 110-1e-5, 1-1e-5, Inf, Inf))
@@ -219,9 +205,9 @@ hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NUL
   if(warn){ warning(paste0("MCMC had some problem with parameter(s): ", paste(sort(unique(param_problemas)), collapse = ", "), ". Try to assign informative prior distributions.")) }
 
   ##############################################################################################
-  ### Objetos retornados pela função
+  ### Return
 
-  ## Cadeias finais
+  ## Final samples
   theta.post = theta.post[seq(bn+1+1, M+1, by = thin),]
 
   return(list(theta.post = theta.post, sigma2 = NULL, cont = cont, inits = inits))

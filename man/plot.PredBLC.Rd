@@ -2,16 +2,16 @@
 % Please edit documentation in R/plot_blc_pred.R
 \name{plot.PredBLC}
 \alias{plot.PredBLC}
-\title{Plot the log-mortality of a prediction}
+\title{BLC: Plot the log-mortality of a prediction}
 \usage{
-\method{plot}{PredBLC}(x, h = NULL, cred = 0.95, plotIC = TRUE, age = NULL, ...)
+\method{plot}{PredBLC}(x, h = NULL, prob = 0.95, plotIC = TRUE, age = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{PredBLC} object, result to the pred() function call on a \code{BLC} object.}
 
 \item{h}{A numeric vector specifying the year(s) in the prediction horizon to be calculated.}
 
-\item{cred}{A real number that represents the probability of the predict interval.}
+\item{prob}{A real number that represents the probability of the predict interval.}
 
 \item{plotIC}{Logical. If 'TRUE' (default), shows the predictive intervals.}
 
@@ -32,14 +32,14 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 #' ## Prediction for 10 years ahead
 pred = predict(fit, h = 3)
 
 ## Plotting
 plot(pred, h = 1)
-\donttest{plot(pred, h = 3, cred = 0.9)}
+\donttest{plot(pred, h = 3, prob = 0.9)}
 
 }
 \seealso{

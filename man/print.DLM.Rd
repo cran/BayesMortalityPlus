@@ -2,7 +2,7 @@
 % Please edit documentation in R/print_dlm.R
 \name{print.DLM}
 \alias{print.DLM}
-\title{Print Values for DLM fitted models}
+\title{DLM: Print}
 \usage{
 \method{print}{DLM}(x, ...)
 }
@@ -26,9 +26,7 @@ USA2010 = USA[USA$Year == 2010,]
 x = 0:100
 Ex = USA2010$Ex.Male[x+1]
 Dx = USA2010$Dx.Male[x+1]
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting DLM
 fit = dlm(y, M = 100, bn = 20, thin = 1)
@@ -36,5 +34,5 @@ print(fit)
 
 }
 \seealso{
-\code{\link[=print.HP]{print.HP()}}, \code{\link[=print.BLC]{print.BLC()}} and \code{\link[=print.PredBLC]{print.PredBLC()}} for \code{HP}, \code{BLC} or \code{PredBLC} methods.
+\code{\link[=print.HP]{print.HP()}} and \code{\link[=print.BLC]{print.BLC()}} for \code{HP} or \code{BLC} methods.
 }

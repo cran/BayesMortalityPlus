@@ -2,9 +2,9 @@
 % Please edit documentation in R/blc.R
 \name{blc}
 \alias{blc}
-\title{Lee-Carter Bayesian Estimation}
+\title{Lee-Carter Bayesian Estimation for mortality data}
 \usage{
-blc(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000)
+blc(Y, prior = NULL, init = NULL, M = 2000, bn = 1000)
 }
 \arguments{
 \item{Y}{Log-mortality rates for each age.}
@@ -15,9 +15,9 @@ variance \eqn{C_0}.}
 \item{init}{A list containing initial values for \eqn{\alpha}, \eqn{\beta},
 \eqn{\phi_V}, \eqn{\phi_W} and \eqn{\theta}.}
 
-\item{numit}{The number of iterations.}
+\item{M}{The number of iterations.}
 
-\item{warmup}{The number of initial iterations from the Gibbs sampler that should be discarded. Default considers half the number of iterations.}
+\item{bn}{The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). Default considers half the number of iterations.}
 }
 \value{
 A \code{BLC} object.
@@ -28,8 +28,8 @@ A \code{BLC} object.
 \item{phiw}{Posterior sample from phiw. phiw is the precision of the random error of the random walk.}
 \item{kappa}{Sampling from the state variables.}
 \item{Y}{Y Log-mortality rates for each age passed by the user to fit the model.}
-\item{warmup}{The warmup of the algorithm specified by the user to fit the model.}
-\item{numit}{The number of iterations specified by the user to fit the model.}
+\item{bn}{The warmup of the algorithm specified by the user to fit the model.}
+\item{M}{The number of iterations specified by the user to fit the model.}
 \item{m0}{The prior mean of kappa0.}
 \item{C0}{The prior covariance matrix of kappa0.}
 }
@@ -75,19 +75,19 @@ require(dplyr)
 require(tidyr)
 require(magrittr)
 
-USA \%>\% mutate(qx = USA$Dx.Total/USA$Ex.Total) -> data
+USA \%>\% mutate(mx = USA$Dx.Total/USA$Ex.Total) -> data
 
 data \%>\%
 	filter(Age \%in\% 18:80 & Year \%in\% 2000:2015)  \%>\%
-	mutate(logqx = log(qx)) \%>\%
-	dplyr::select(Year,Age,logqx) \%>\%
-	pivot_wider(names_from = Year, values_from = logqx) \%>\%
+	mutate(logmx = log(mx)) \%>\%
+	dplyr::select(Year,Age,logmx) \%>\%
+	pivot_wider(names_from = Year, values_from = logmx) \%>\%
 	dplyr::select(-Age) \%>\%
 	as.matrix()  \%>\%
 	magrittr::set_rownames(18:80) -> Y
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 print(fit)
 
 ## Viewing the results

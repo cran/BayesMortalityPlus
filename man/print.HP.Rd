@@ -2,7 +2,7 @@
 % Please edit documentation in R/print_hp.R
 \name{print.HP}
 \alias{print.HP}
-\title{Print Values for HP fitted models}
+\title{HP: Print}
 \usage{
 \method{print}{HP}(x, ...)
 }
@@ -33,5 +33,5 @@ print(fit)
 
 }
 \seealso{
-\code{\link[=print.DLM]{print.DLM()}}, \code{\link[=print.BLC]{print.BLC()}} and \code{\link[=print.PredBLC]{print.PredBLC()}} for \code{DLM}, \code{BLC} or \code{PredBLC} methods.
+\code{\link[=print.DLM]{print.DLM()}} and \code{\link[=print.BLC]{print.BLC()}} for \code{DLM} or \code{BLC} methods.
 }

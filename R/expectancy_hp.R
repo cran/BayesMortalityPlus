@@ -1,7 +1,7 @@
 #' @name expectancy.HP
 #' @rdname expectancy.HP
 #'
-#' @title HP Model: Life expectancy
+#' @title HP: Life expectancy
 #'
 #' @description This function computes the life expectancy for each age for Heligman-Pollard model.
 #'
@@ -43,7 +43,6 @@
 #' max_age = 105, prob = 0.99, graph = FALSE)
 #'
 #'
-#' @include qx_ci.R
 #' @include fitted_hp.R
 #'
 #' @import ggplot2
@@ -62,60 +61,37 @@ expectancy.HP <- function(x, Ex = NULL, age = NULL, graph = TRUE,
     stop("Invalid age interval. Check the max_age argument")
   }
 
+  ## calculating qx and px ----
+  # extrapolating the age interval to max_age
 
-  ##calculo do qx e px estimados.
-  #fechando a tabua::
-  qx_est <- fitted(fit, age = 0:max_age)$qx_fitted
-
-  exp_total <- rep(NA, max_age)
-
-  #cumprod for life expectancy (px)
-  for (i in 1:max_age){
-    exp_total[i] <- sum(cumprod(1-qx_est[i:max_age]))
-  }
-  exp_total <- round(exp_total,2)
-
-
-  ##IC
   if(fit$info$model %in% c("binomial","poisson")){
     if(is.null(Ex)){
       Ex <- c(fit$data$Ex, rep(fit$data$Ex[length(fit$data$Ex)], (max_age+1)-length(fit$data$Ex)))
-      est_IC <- qx_ci(fit, age = 0:max_age, Ex = Ex, prob = prob)
+
+      aux <- fitted(fit, age = 0:max_age, Ex = Ex, prob = prob)
+      est_IC <- aux
     }else{
-      est_IC <- qx_ci(fit, age = 0:max_age, Ex = Ex, prob = prob)
+      aux <- fitted(fit, age = 0:max_age, Ex = Ex, prob = prob)
+      est_IC <- aux
     }
   }else{
-    est_IC <- qx_ci(fit, age = 0:max_age, prob = prob)
+    aux <- fitted(fit, age = 0:max_age, prob = prob)
+    est_IC <- aux
   }
+  qx_est <- aux$qx_fitted
 
-  ##ci
-  exp_inf <- rep(NA,max_age); exp_sup <- rep(NA,max_age)
 
-  ### upper CI:
-  for (i in 1:max_age) {
-    exp_sup[i] <- sum(cumprod(1-est_IC$qi[i:max_age]))
+  exp_total <- rep(NA_real_, max_age); exp_inf <- rep(NA_real_,max_age); exp_sup <- rep(NA_real_,max_age)
+
+  # cumprod for life expectancy (px)
+  for (i in 1:max_age){
+    exp_total[i] <- sum(cumprod(1-qx_est[i:max_age])) ## px
+    exp_sup[i] <- sum(cumprod(1-est_IC$qi[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-est_IC$qs[i:max_age])) ## lower CI
   }
+  exp_total <- round(exp_total,2)
   exp_sup <- round(exp_sup,2)
-
-  ### lower CI:
-  for (i in 1:max_age) {
-    exp_inf[i] <- sum(cumprod(1-est_IC$qs[i:max_age]))
-  }
   exp_inf <- round(exp_inf,2)
-
-  # #funcao iteracao_exp
-  # iteracao_exp <- function(x){
-  #   ex_est <- c(x[1])
-  #   for(i in 2:length(x)){
-  #     ex_est[i] <- ex_est[i-1]*x[i]
-  #   }
-  #   exp_total <- c(sum(ex_est))
-  #   for(i in 2:length(x)){
-  #     ex_est <- ex_est/ex_est[i-1]
-  #     exp_total[i] <- sum(ex_est[i:length(x)])
-  #   }
-  #   return(exp_total)
-  # }
 
 
   tab <- data.frame(x = 0:max(age),
@@ -148,34 +124,23 @@ expectancy.ClosedHP <- function(x, age = seq(0, max(fit$data$x),by = 10),
     stop("Invalid age interval. Check the ages modeled")
   }
 
-  ##calculo do qx e px estimados.
-    qx_est <- fitted(fit)$qx_fitted
+  ## calculating qx and px
+  aux <- fitted(fit, prob = prob)
+  qx_est <- aux$qx_fitted
+  est_IC <- aux
 
-    #####IC
-    est_IC <- qx_ci(fit, prob = prob)
+  exp_total <- rep(NA_real_, max_age); exp_inf <- rep(NA_real_,max_age); exp_sup <- rep(NA_real_,max_age)
 
-  exp_total <- rep(NA, max_age)
-
-  #cumprod for life expectancy (px)
+  # cumprod for life expectancy (px)
   for (i in 1:max_age){
-    exp_total[i] <- sum(cumprod(1-qx_est[i:max_age]))
+    exp_total[i] <- sum(cumprod(1-qx_est[i:max_age])) ## px
+    exp_sup[i] <- sum(cumprod(1-est_IC$qi[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-est_IC$qs[i:max_age])) ## lower CI
   }
   exp_total <- round(exp_total,2)
-
-  ##ci
-  exp_inf <- rep(NA,max_age); exp_sup <- rep(NA,max_age)
-
-  ### upper CI:
-  for (i in 1:max_age) {
-    exp_sup[i] <- sum(cumprod(1-est_IC$qi[i:max_age]))
-  }
   exp_sup <- round(exp_sup,2)
-
-  ### lower CI:
-  for (i in 1:max_age) {
-    exp_inf[i] <- sum(cumprod(1-est_IC$qs[i:max_age]))
-  }
   exp_inf <- round(exp_inf,2)
+
 
   tab <- data.frame(x = 0:(max(age)),
                     exp_total[1:(max(age)+1)],

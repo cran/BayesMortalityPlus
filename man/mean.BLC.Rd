@@ -2,7 +2,7 @@
 % Please edit documentation in R/mean_blc.R
 \name{mean.BLC}
 \alias{mean.BLC}
-\title{Arithmetic Mean for BLC fitted models}
+\title{BLC: Arithmetic mean}
 \usage{
 \method{mean}{BLC}(x, name, ...)
 }
@@ -24,7 +24,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 mean(fit, "kappa")
 

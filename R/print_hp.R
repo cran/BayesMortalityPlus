@@ -1,7 +1,7 @@
 #' @name print.HP
 #' @rdname print.HP
 #'
-#' @title Print Values for HP fitted models
+#' @title HP: Print
 #'
 #' @description Print details from a fitted `HP` or `ClosedHP` models and returns it invisibly.
 #'
@@ -25,7 +25,7 @@
 #' fit = hp(x = x, Ex = Ex, Dx = Dx, M = 5000, bn = 0, thin = 10)
 #' print(fit)
 #'
-#' @seealso [print.DLM()], [print.BLC()] and [print.PredBLC()] for `DLM`, `BLC` or `PredBLC` methods.
+#' @seealso [print.DLM()] and [print.BLC()] for `DLM` or `BLC` methods.
 #'
 #' @export
 print.HP <- function(x, ...){

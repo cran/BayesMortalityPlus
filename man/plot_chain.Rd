@@ -29,7 +29,7 @@ USA2010 = USA[USA$Year == 2010,]
 x = 0:90
 Ex = USA2010$Ex.Total[x+1]
 Dx = USA2010$Dx.Total[x+1]
-y = log(1 - exp(-Dx/Ex))
+y = log(Dx/Ex)
 
 ## Fitting HP model
 fit = hp(x = x, Ex = Ex, Dx = Dx, model = "lognormal",

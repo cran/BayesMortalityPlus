@@ -2,7 +2,7 @@
 % Please edit documentation in R/hp_close.R
 \name{hp_close}
 \alias{hp_close}
-\title{HP Model: Fitting the advanced ages of the life tables.}
+\title{HP: Fitting the advanced ages of the life tables}
 \usage{
 hp_close (fit, method = c("hp", "plateau", "linear", "gompertz"),
  x0 = max(fit$data$x), max_age = 120, k = 7,
@@ -73,9 +73,6 @@ close4 = hp_close(fit, method = "gompertz", x0 = 70,
 
 #### Using the other functions available in the package with the 'ClosedHP' object:
 
-## credible intervals (See "?qx_ci" for more options):
-qx_ci(close1)
-
 ## qx estimation (See "?fitted.HP" in the BayesMortalityPlus package for more options):
 fitted(close2)
 
@@ -100,6 +97,4 @@ Dodd, Erengul, Forster, Jonathan, Bijak, Jakub, & Smith, Peter 2018. “Smoothin
 
 \code{\link[=expectancy.HP]{expectancy.HP()}} and \code{\link[=Heatmap.HP]{Heatmap.HP()}} for \code{ClosedHP} methods to compute and visualise the truncated life expectancy
 via \code{\link[=expectancy]{expectancy()}} and \code{\link[=Heatmap]{Heatmap()}} functions.
-
-\code{\link[=qx_ci]{qx_ci()}} to compute credible intervals.
 }

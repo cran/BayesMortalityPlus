@@ -1,18 +1,18 @@
 #' @name print.BLC
 #' @rdname print.BLC
 #'
-#' @title Print Values for BLC fitted models
+#' @title BLC: Print
 #'
 #' @description Print details from a fitted BLC model and returns it invisibly.
 #'
 #'
-#' @param x A `BLC` object, result of a call to blc() function.
+#' @param x A `BLC` or `PredBLC`object, result of a call to blc() or predict() function.
 #' @param ... Further arguments passed to or from other methods.
 #'
-#' @return A character vector with the details of a fitted `BLC` model.
+#' @return A character vector with the details of a fitted `BLC` or `PredBLC` model.
 #'
 #'
-#' @seealso [print.DLM()], [print.HP()] and [print.PredBLC()] for `DLM`, `HP` or `PredBLC` methods.
+#' @seealso [print.DLM()] and [print.HP()] for `DLM` or `HP` methods.
 #'
 #' @export
 print.BLC <- function(x, ...) {
@@ -22,8 +22,18 @@ print.BLC <- function(x, ...) {
 	catf("Bayesian Lee-Carter Estimation\n")
 	catf("Age groups: %d", nrow(obj$Y))
 	catf("Time length: %d", ncol(obj$Y))
-	catf("Iterations: %d (%d for warm-up)", obj$numit, obj$warmup)
+	catf("Iterations: %d (%d for warm-up)", obj$M, obj$bn)
 	catf("Prior: N(%.2f, %.2e)", obj$m0, obj$C0)
 
 	invisible(obj)
+}
+
+#' @export
+print.PredBLC <- function(x, ...) {
+  obj = x
+  cat(sprintf('Forecast of a Bayesian Lee-Carter model (h = %d)\n',
+              obj$h))
+  cat("\n")
+
+  invisible(obj)
 }

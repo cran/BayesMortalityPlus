@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict_blc.R
 \name{predict.BLC}
 \alias{predict.BLC}
-\title{Forecast for fitted BLC models}
+\title{BLC: Forecasting}
 \usage{
 \method{predict}{BLC}(object, h, ...)
 }
@@ -27,7 +27,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Prediction for 2 years ahead
 pred = predict(fit, h = 2)
@@ -35,7 +35,7 @@ print(pred)
 
 }
 \seealso{
-\code{\link[=fitted.BLC]{fitted.BLC()}}, \code{\link[=print.BLC]{print.BLC()}}, and \code{\link[=plot.BLC]{plot.BLC()}} for \code{PredBLC} methods to native R functions \code{\link[=fitted]{fitted()}},
+\code{\link[=fitted.BLC]{fitted.BLC()}}, \code{\link[=print.BLC]{print.BLC()}}, and \code{\link[=plot.PredBLC]{plot.PredBLC()}} for \code{PredBLC} methods to native R functions \code{\link[=fitted]{fitted()}},
 \code{\link[=print]{print()}}, and \code{\link[=plot]{plot()}}.
 
 \code{\link[=expectancy.BLC]{expectancy.BLC()}} and \link{Heatmap.BLC} to compute and plot the life expectancy of the prediction(s).

@@ -1,7 +1,7 @@
 #' @name quantile.PredBLC
 #' @rdname quantile.PredBLC
 #'
-#' @title Sample Quantiles for Predictions
+#' @title BLC: Sample quantiles for predictions
 #'
 #' @description Calculates the quantiles of log-mortality based on the resulting chains from a predicted year.
 #'
@@ -19,7 +19,7 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Prediction for 2 years ahead
 #' pred = predict(fit, h = 2)

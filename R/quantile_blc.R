@@ -1,7 +1,7 @@
 #' @name quantile.BLC
 #' @rdname quantile.BLC
 #'
-#' @title Sample Quantiles for BLC fitted models
+#' @title BLC: Sample quantiles
 #'
 #' @description Compute the quantiles based on the resulting chains from a fitted BLC model.
 #'
@@ -19,7 +19,7 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Parameters' median and quantiles 0.05, 0.95
 #' quantile(fit, c(0.05, 0.5, 0.95), "alpha")
@@ -38,9 +38,9 @@ quantile.BLC <- function(x, q, name, ...) {
 	vectorNames <- c("theta", "phiw")
 
 	if (name %in% matrixNames) {
-		apply(obj[[name]][ ,(obj$warmup+1):obj$numit], 1, quantile, q)
+		apply(obj[[name]][ ,(obj$bn+1):obj$M], 1, quantile, q)
 	} else if (name %in% vectorNames) {
-		quantile(obj[[name]][(obj$warmup+1):obj$numit], q)
+		quantile(obj[[name]][(obj$bn+1):obj$M], q)
 	} else {
 		stop("Invalid `name` argument")
 	}

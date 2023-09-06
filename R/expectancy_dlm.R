@@ -26,10 +26,7 @@
 #'
 #' Ex = USA1990$Ex.Total[1:111]
 #' Dx = USA1990$Dx.Total[1:111]
-#'
-#' qx_t <- Dx/Ex
-#' qx_t <- 1 - exp(-qx_t)
-#' y <- log(qx_t)
+#' y <- log(Dx/Ex)
 #'
 #' fit <- dlm(y, M = 100, bn = 20, thin = 1)
 #' expectancy(fit)
@@ -42,7 +39,6 @@
 #' prob = 0.99, max_age = 90, graph = FALSE)
 #'
 #'
-#' @include qx_ci.R
 #' @include fitted_dlm.R
 #'
 #' @import ggplot2
@@ -64,39 +60,30 @@ expectancy.DLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
   }
   max_age = max_age+1
 
-  #calculating qx and ci
+  ## calculating qx and ci
   if(max_age > max(fit$info$ages)){
-    pred <- predict( fit, h = (max_age - max(fit$info$ages)), prob = prob )
-    mu <- c(fitted(fit)$qx_fitted,pred$qx_fitted)
-    ic <- rbind(qx_ci(fit, prob = prob)[,-1],data.frame(qi = pred$qx_inf, qs = pred$qx_sup))
+    pred <- predict(fit, h = (max_age - max(fit$info$ages)), prob = prob )
+    aux <- fitted(fit, prob = prob)
+    mu <- c(aux$qx_fitted, pred$qx_fitted)
+    ic <- rbind(aux[,-c(1,2)], data.frame(qi = pred$qx_inf, qs = pred$qx_sup))
   }else{
-    mu <- fitted(fit)$qx_fitted
-    ic <- qx_ci(fit, prob=prob)
+    aux <- fitted(fit, prob = prob)
+    mu <- aux$qx_fitted
+    ic <- aux[,-2]
   }
 
-  exp_total <- rep(NA, max_age)
 
-  #cumprod for life expectancy (px)
-  for (i in 1:max_age) {
-    exp_total[i] <- sum(cumprod(1-mu[i:max_age]))
+  exp_total <- rep(NA_real_, max_age); exp_inf <- rep(NA_real_,max_age); exp_sup <- rep(NA_real_,max_age)
+
+  # cumprod for life expectancy (px)
+  for (i in 1:max_age){
+    exp_total[i] <- sum(cumprod(1-mu[i:max_age])) ## px
+    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age])) ## lower CI
   }
   exp_total <- round(exp_total,2)
-
-
-  exp_inf <- rep(NA,max_age); exp_sup <- rep(NA,max_age)
-
-  ### upper CI:
-  for (i in 1:max_age) {
-    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age]))
-  }
   exp_sup <- round(exp_sup,2)
-
-  ### lower CI:
-  for (i in 1:max_age) {
-    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age]))
-  }
   exp_inf <- round(exp_inf,2)
-
 
   tab <- data.frame(x = 0:(max(age)),
                     exp_total[1:(max(age)+1)],
@@ -122,39 +109,30 @@ expectancy.ClosedDLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
                                  graph = TRUE, prob = 0.95, ...){
 
   fit = x
-  ###sanity check
+  ### sanity check
   if(max(age) > max(fit$info$ages)){
     stop("Invalid age interval. Check the ages modeled")
   }
 
-  #last age modeled
+  ## last age modeled
   max_age <- max(fit$info$ages)
 
-  ##calculating log(qx)
-  mu <- apply(fit$qx, 2, median)
-  exp_total <- rep(NA, max_age)
+  ## calculating log(qx)
+  aux <- fitted(fit, prob = prob)
+  mu <- aux$qx_fitted
+  ic <- aux[,-2]
 
-  #cumprod for life expectancy (px)
-  for (i in 1:max_age) {
-    exp_total[i] <- sum(cumprod(1-mu[i:max_age]))
+
+  exp_total <- rep(NA_real_, max_age); exp_inf <- rep(NA_real_,max_age); exp_sup <- rep(NA_real_,max_age)
+
+  # cumprod for life expectancy (px)
+  for (i in 1:max_age){
+    exp_total[i] <- sum(cumprod(1-mu[i:max_age])) ## px
+    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age])) ## lower CI
   }
   exp_total <- round(exp_total,2)
-
-
-  ##ci
-  ic <- qx_ci(fit, prob=prob)
-  exp_inf <- rep(NA,max_age); exp_sup <- rep(NA,max_age)
-
-  ### upper CI:
-  for (i in 1:max_age) {
-    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age]))
-  }
   exp_sup <- round(exp_sup,2)
-
-  ### lower CI:
-  for (i in 1:max_age) {
-    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age]))
-  }
   exp_inf <- round(exp_inf,2)
 
 

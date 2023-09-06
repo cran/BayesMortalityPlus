@@ -1,4 +1,4 @@
-#' @title HP Model: Fitting the advanced ages of the life tables.
+#' @title HP: Fitting the advanced ages of the life tables
 #'
 #' @description This function receives an object of the class `HP` fitted by the hp() function
 #' and fits a closing method to expand the life tables dataset to a maximum age argument inputted
@@ -61,9 +61,6 @@
 #'
 #' #### Using the other functions available in the package with the 'ClosedHP' object:
 #'
-#' ## credible intervals (See "?qx_ci" for more options):
-#' qx_ci(close1)
-#'
 #' ## qx estimation (See "?fitted.HP" in the BayesMortalityPlus package for more options):
 #' fitted(close2)
 #'
@@ -84,7 +81,6 @@
 #'[expectancy.HP()] and [Heatmap.HP()] for `ClosedHP` methods to compute and visualise the truncated life expectancy
 #'via [expectancy()] and [Heatmap()] functions.
 #'
-#'[qx_ci()] to compute credible intervals.
 #'
 #' @include fun_aux.R
 #' @include sir_gompertz.R
@@ -141,17 +137,17 @@ hp_close = function(fit, method = c("hp", "plateau", "linear", "gompertz"), x0 =
 
   ## Completing the data for the closing method:
   if(fit$info$model == "lognormal") {
-    new_Ex = c(new_Ex, rep(NA, max_age-age_last_data_Ex))
+    new_Ex = c(new_Ex, rep(NA_real_, max_age-age_last_data_Ex))
   }else{
     new_Ex = c(new_Ex, rep(new_Ex[length(new_Ex)], max_age-age_last_data_Ex))
   }
-  new_Dx = c(new_Dx, rep(NA, max_age-age_last_data_Dx))
+  new_Dx = c(new_Dx, rep(NA_real_, max_age-age_last_data_Dx))
 
   ## Data between 0 and the maximum age:
   full_Ex = c(new_Ex)
   full_Dx = c(new_Dx)
 
-  ### CHECAR
+  ### CHECK
   if(method == "linear" | method == "gompertz"){
     data = data.frame(x = (x0-k):(age_last_data_Ex))
     data$Ex = full_Ex[data$x + 1 - min_age]
@@ -175,7 +171,7 @@ hp_close = function(fit, method = c("hp", "plateau", "linear", "gompertz"), x0 =
   colnames(closed) = old_x
 
   ## Returns of the function: qx chains, x = min_age, ..., max_age
-  ret = matrix(NA, nrow = num_sim, ncol = max_age + 1 - min_age)
+  ret = matrix(NA_real_, nrow = num_sim, ncol = max_age + 1 - min_age)
 
   ## Closing methods
   if (method == "hp"){
@@ -209,31 +205,46 @@ hp_close = function(fit, method = c("hp", "plateau", "linear", "gompertz"), x0 =
 
   }else if(method == "plateau"){
 
-    # gets the death probability of x0 and applies it till max_age
     if(fit$info$model == "lognormal"){
-      for (i in 1:num_sim){
-        hp = hp_curve(x0, fit$post.samples$mcmc_theta[i, ])
-        sim = exp(rnorm(1, log(hp), sqrt(fit$post.samples$sigma2[i])))
-        closed[i, ] = sim/(1+sim)
-      }
+      # for (i in 1:num_sim){
+      #   hp = hp_curve(x0, fit$post.samples$mcmc_theta[i, ])
+      #   sim = exp(rnorm(1, log(hp), sqrt(fit$post.samples$sigma2[i])))
+      #   closed[i, ] = sim/(1+sim)
+      # }
+      # gets the death probability of x0 and applies it till max_age
+      hp = hp_curve(x0, fit$post.samples$mcmc_theta)
+      sim = exp(rnorm(num_sim, log(hp), sqrt(fit$post.samples$sigma2)))
+      closed <- matrix(sim/(1+sim), num_sim, old_len)
+
     }else if(fit$info$model == "binomial"){
       aux_Ex = full_Ex[x0+1-min_age]
-      for (i in 1:num_sim){
-        qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta[i,]))
-        qx = ifelse(qx > 1, 1, qx)
-        qx = ifelse(qx < 0, 0, qx)
-        sim = rbinom(1, trunc(aux_Ex), qx)
-        closed[i, ] = sim/trunc(aux_Ex)
-      }
+      # for (i in 1:num_sim){
+      #   qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta[i,]))
+      #   qx = ifelse(qx > 1, 1, qx)
+      #   qx = ifelse(qx < 0, 0, qx)
+      #   sim = rbinom(1, trunc(aux_Ex), qx)
+      #   closed[i, ] = sim/trunc(aux_Ex)
+      # }
+      qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta))
+      qx = ifelse(qx > 1, 1, qx)
+      qx = ifelse(qx < 0, 0, qx)
+      sim = rbinom(num_sim, rep(trunc(aux_Ex), num_sim), qx)
+      closed <- matrix(sim/trunc(aux_Ex), num_sim, old_len)
+
     }else{
       aux_Ex = full_Ex[x0+1-min_age]
-      for (i in 1:num_sim){
-        qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta[i,]))
-        qx = ifelse(qx > 1, 1, qx)
-        qx = ifelse(qx < 0, 0, qx)
-        sim = rpois(1, aux_Ex*qx)
-        closed[i, ] = sim/aux_Ex
-      }
+      # for (i in 1:num_sim){
+      #   qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta[i,]))
+      #   qx = ifelse(qx > 1, 1, qx)
+      #   qx = ifelse(qx < 0, 0, qx)
+      #   sim = rpois(1, aux_Ex*qx)
+      #   closed[i, ] = sim/aux_Ex
+      # }
+      qx = 1 - exp(-hp_curve_9(x0, fit$post.samples$mcmc_theta))
+      qx = ifelse(qx > 1, 1, qx)
+      qx = ifelse(qx < 0, 0, qx)
+      sim = rpois(num_sim, aux_Ex*qx)
+      closed <- matrix(sim/aux_Ex, num_sim, old_len)
     }
 
   }else if(method == "linear"){

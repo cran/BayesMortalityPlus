@@ -1,7 +1,7 @@
 #' @name summary.DLM
 #' @rdname summary.DLM
 #'
-#' @title Summary for DLM fitted models
+#' @title DLM: Summary
 #'
 #' @description Summarizes information from the parameters' markov chains of a fitted `DLM` or `ClosedDLM` model.
 #'
@@ -21,9 +21,7 @@
 #' x = 0:100
 #' Ex = USA2010$Ex.Male[x+1]
 #' Dx = USA2010$Dx.Male[x+1]
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
-#' y = log(qx_t)
+#' y = log(Dx/Ex)
 #'
 #' ## Fitting DLM
 #' fit = dlm(y, M = 100, bn = 20, thin = 1)
@@ -36,7 +34,6 @@ summary.DLM <- function(object, digits = 5, ...){
   fit = object
   summ = rbind(resumo(fit$sig2),
                resumo(fit$mu))
-  # summ = as.data.frame(summary)
   row.names(summ) = c("sigma2", paste0("mu[", fit$info$ages, "]"))
   return(round(summ, digits))
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/heatmap_blc.R
 \name{Heatmap.BLC}
 \alias{Heatmap.BLC}
-\title{Draw a Heat Map for BLC or PredBLC fitted models}
+\title{BLC: Heatmap for the life expectancy}
 \usage{
 \method{Heatmap}{BLC}(x, x_lab = NULL, age = NULL, color = c("red", "white", "blue"), ...)
 }
@@ -30,7 +30,7 @@ Y <- PT
 
 ## Fitting the model
 
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Heatmap:
 Heatmap(fit, x_lab = 2000:2015, age = 18:80)

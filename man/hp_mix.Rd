@@ -2,7 +2,7 @@
 % Please edit documentation in R/hp_mix.R
 \name{hp_mix}
 \alias{hp_mix}
-\title{HP Model mixture}
+\title{HP: Model mixture}
 \usage{
 hp_mix (fit, mu_post, weights = NULL, mix_age,
  x0_prior, x0_post, max_age)

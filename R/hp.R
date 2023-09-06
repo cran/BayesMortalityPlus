@@ -1,4 +1,4 @@
-#' @title Bayesian HP
+#' @title Bayesian Heligman-Pollard curve for mortality table graduation
 #'
 #' @description
 #'
@@ -23,7 +23,7 @@
 #' @param m Numeric vector with the mean of the prior distributions for (A, B, C, D, E, F, G, H).
 #' @param v Numeric vector with the variance of the prior distributions for (A, B, C, D, E, F, G, H).
 #' @param inits Numeric vector with the initial values for the parameters (A, B, C, D, E, F, G, H).
-#' @param K Number that specifies the extra parameter 'K' value for binomial and poisson models. It is considered only if model = "binomial" or model = "poisson". The default value is 1.
+#' @param K Number that specifies the extra parameter 'K' value for binomial and poisson models. It is considered only if model = "binomial" or model = "poisson". The default value is the optimal value.
 #' @param sigma2 Positive number that specifies initial value of sigma2 in lognormal model. It is considered only if model = "lognormal".
 #' @param prop.control Positive number that is considered for tuning the acceptance rate of MCMC.
 #' @param reduced_model Logical value which determines if reduced model should be addressed. If 'TRUE' (default), the first term of the HP curve (infant mortality) is not considered.
@@ -53,7 +53,7 @@
 #' case, A, B and C are fixed as zero.
 #'
 #' All parameters, with the exception of the extra parameter K of the Binomial and the Poisson models
-#' that is fixed in value 1, are estimated by the MCMC methods. Gibbs sampling for sigma2 and
+#' that is the estimated optimal value, are estimated by the MCMC methods. Gibbs sampling for sigma2 and
 #' Metropolis-Hastings for parameters A, B, C, D, E, F, G and H. Informative prior distributions
 #' should help the method to converge quickly.
 #'
@@ -106,9 +106,6 @@
 #' ## chain's plot (See "?plot_chain" for more options):
 #' plot_chain(fit)
 #'
-#' ## credible intervals (See "?qx_ci" for more options):
-#' qx_ci(fit)
-#'
 #'@seealso [fitted.HP()], [plot.HP()], [print.HP()] and [summary.HP()] for `HP` methods to native R functions [fitted()],
 #'[plot()], [print()] and [summary()].
 #'
@@ -117,7 +114,7 @@
 #'
 #'[hp_close()] for close methods to expand the life tables and [hp_mix()] for mixing life tables.
 #'
-#'[qx_ci()] and [plot_chain()] to compute credible intervals and visualise the markov chains, respectively.
+#'[plot_chain()] to visualise the markov chains, respectively.
 #'
 #'
 #' @include hp_binomial.R
@@ -134,14 +131,13 @@
 #'
 #' @export
 hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 50000, bn = round(M/2),
-               thin = 10, m = rep(NA, 8), v = rep(NA, 8), inits = NULL, K = NULL, sigma2 = NULL,
+               thin = 10, m = rep(NA_real_, 8), v = rep(NA_real_, 8), inits = NULL, K = NULL, sigma2 = NULL,
                prop.control = NULL, reduced_model = FALSE){
 
   ##############################################################################################
-  ### Verificando argumentos da função
+  ### Validation
   model = match.arg(model)
 
-  #### Passagem dos dados está correta
   x <- unique(trunc(x)); tam_x = length(x); tam_ex = length(Ex); tam_dx = length(Dx)
   if(tam_x != tam_ex || tam_x != tam_dx || tam_ex != tam_dx){ stop("x, Ex, Dx must be the same length.") }
   if(sum(x < 0, na.rm = T) > 0 || sum(Ex < 0, na.rm = T) > 0 || sum(Dx < 0, na.rm = T) > 0){ stop("x, Ex, Dx must be nonnegative numbers.") }
@@ -149,13 +145,12 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
   x0 <- min(x, na.rm = T)
   if(x0 >= 15){ if(!reduced_model) warning("Lower age >= 15. We recommend to use reduced_model = TRUE.", immediate. = T) }
 
-  #### Argumentos referentes ao número de iterações e burn-in
   M = as.integer(trunc(M)); bn = as.integer(trunc(bn)); thin = trunc(thin)
   if(M < 1 || bn < 0 || thin < 1){ stop("M, bn and thin must be positive numbers.") }
 
-  #### Verificando as prioris foram passados como argumento da função e se foram passados de forma correta
+  #### priori validation
 
-  ## Médias
+  ## Means
   m_default <- c(1/51, 0.5, 2/12, 1/51, 3/0.5, 25, 1/101, 100/90)
   if(length(m) != 8) {stop("Length of m must be equal to 8.") }
 
@@ -166,7 +161,7 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
 
   if(any(m[c(1:5,7,8)] <= 0) || any(m[c(1:4,7)] >= 1) || m[6] <= 15 || m[6] >= 110){param = LETTERS[1:8]; stop(sprintf("The means are not in the correct interval for the parameters.", paste(param[which((m <= lower || m >= upper))], collapse = ", ")))}
 
-  ## Variâncias
+  ## Var
   v_default <- c(50/((51^2)*(52)), 1/12, 20/((12^2)*13), 50/((51^2)*(52)), 3/0.25, 100, 100/((101^2)*(102)), 1/81)
   if(length(v) != 8) {stop("Length of v must be equal to 8.") }
 
@@ -210,7 +205,7 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
   }
 
   ##############################################################################################
-  ### Organizando os resultados do mcmc
+  ### house keeping
 
   param = c("A", "B", "C", "D", "E", "F", "G", "H", "K")
   if(model == "lognormal"){ param = param[-9] }
@@ -219,11 +214,11 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
   Qx = 1-exp(-Dx/Ex)
   data = data.frame(x = x, Ex = Ex, Dx = Dx, qx = Qx)
 
-  #### Cadeias finais
+  #### final samples
   mcmc_theta = mcmc$theta.post
   sigma2 = mcmc$sigma2
 
-  #### Resumo
+  #### summary
   accept = 100*t(data.frame(
     a = mcmc$cont[1]/M,
     b = mcmc$cont[2]/M,
@@ -249,7 +244,7 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
   #### prioris
   prior.dist <- t(data.frame(means = m, vars = v)); colnames(prior.dist) = param[-9]
 
-  ### Objetos retornados pela função
+  ### returns
   return(structure(list(summary = round(resumo, 6),
               post.samples = list(mcmc_theta = mcmc_theta, sigma2 = sigma2),
               data = data,

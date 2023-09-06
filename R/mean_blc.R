@@ -1,7 +1,7 @@
 #' @name mean.BLC
 #' @rdname mean.BLC
 #'
-#' @title Arithmetic Mean for BLC fitted models
+#' @title BLC: Arithmetic mean
 #'
 #' @description Calculates the means based on the resulting chains from a fitted BLC model.
 #'
@@ -17,7 +17,7 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' mean(fit, "kappa")
 #'
@@ -31,9 +31,9 @@ mean.BLC <- function(x, name, ...) {
 	vectorNames <- c("theta", "phiw")
 
 	if (name %in% matrixNames) {
-		apply(obj[[name]][ ,(obj$warmup+1):obj$numit], 1, mean)
+		apply(obj[[name]][ ,(obj$bn+1):obj$M], 1, mean)
 	} else if (name %in% vectorNames) {
-		mean(obj[[name]][(obj$warmup+1):obj$numit])
+		mean(obj[[name]][(obj$bn+1):obj$M])
 	} else {
 		stop("Invalid `name` argument")
 	}

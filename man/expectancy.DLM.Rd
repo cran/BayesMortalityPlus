@@ -42,10 +42,7 @@ USA1990 = USA[USA$Year == 1990,]
 
 Ex = USA1990$Ex.Total[1:111]
 Dx = USA1990$Dx.Total[1:111]
-
-qx_t <- Dx/Ex
-qx_t <- 1 - exp(-qx_t)
-y <- log(qx_t)
+y <- log(Dx/Ex)
 
 fit <- dlm(y, M = 100, bn = 20, thin = 1)
 expectancy(fit)

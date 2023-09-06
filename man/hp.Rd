@@ -2,7 +2,7 @@
 % Please edit documentation in R/hp.R
 \name{hp}
 \alias{hp}
-\title{Bayesian HP}
+\title{Bayesian Heligman-Pollard curve for mortality table graduation}
 \usage{
 hp(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"),
  M = 50000, bn = round(M/2), thin = 10, m = rep(NA, 8), v = rep(NA, 8),
@@ -30,7 +30,7 @@ hp(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"),
 
 \item{inits}{Numeric vector with the initial values for the parameters (A, B, C, D, E, F, G, H).}
 
-\item{K}{Number that specifies the extra parameter 'K' value for binomial and poisson models. It is considered only if model = "binomial" or model = "poisson". The default value is 1.}
+\item{K}{Number that specifies the extra parameter 'K' value for binomial and poisson models. It is considered only if model = "binomial" or model = "poisson". The default value is the optimal value.}
 
 \item{sigma2}{Positive number that specifies initial value of sigma2 in lognormal model. It is considered only if model = "lognormal".}
 
@@ -76,7 +76,7 @@ The reduced model does not consider the first term of the HP curve: \eqn{A^{(x+B
 case, A, B and C are fixed as zero.
 
 All parameters, with the exception of the extra parameter K of the Binomial and the Poisson models
-that is fixed in value 1, are estimated by the MCMC methods. Gibbs sampling for sigma2 and
+that is the estimated optimal value, are estimated by the MCMC methods. Gibbs sampling for sigma2 and
 Metropolis-Hastings for parameters A, B, C, D, E, F, G and H. Informative prior distributions
 should help the method to converge quickly.
 }
@@ -120,9 +120,6 @@ fitted(fit)
 ## chain's plot (See "?plot_chain" for more options):
 plot_chain(fit)
 
-## credible intervals (See "?qx_ci" for more options):
-qx_ci(fit)
-
 }
 \references{
 Dellaportas, P., Smith, A. F., and Stavropoulos, P. (2001). “Bayesian Analysis of Mortality Data.” \emph{Journal of the Royal Statistical Society: Series A (Statistics in Society)} 164 (2). Wiley Online Library: 275–291.
@@ -138,5 +135,5 @@ via \code{\link[=expectancy]{expectancy()}} and \code{\link[=Heatmap]{Heatmap()}
 
 \code{\link[=hp_close]{hp_close()}} for close methods to expand the life tables and \code{\link[=hp_mix]{hp_mix()}} for mixing life tables.
 
-\code{\link[=qx_ci]{qx_ci()}} and \code{\link[=plot_chain]{plot_chain()}} to compute credible intervals and visualise the markov chains, respectively.
+\code{\link[=plot_chain]{plot_chain()}} to visualise the markov chains, respectively.
 }

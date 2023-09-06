@@ -1,7 +1,7 @@
 #' @name plot.HP
 #' @rdname plot.HP
 #'
-#' @title HP Model: Plot the life table.
+#' @title HP: Plot the life table
 #'
 #' @description Function that returns a log-scale ggplot of `HP` and `ClosedHP` objects returned by the hp() and hp_close() functions.
 #'
@@ -42,7 +42,6 @@
 #'      plotIC = FALSE, colors = c("red", "blue"),
 #'      labels = c("Poisson", "Lognormal"))
 #'
-#' @include qx_ci.R
 #' @include fitted_hp.R
 #' @include fun_aux.R
 #'
@@ -61,8 +60,8 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
                     plotData = TRUE, labels = NULL, colors = NULL,
                     linetype = NULL, prob = 0.95, ...){
   fit = x
-  qx_fit = fitted(fit, age = age)
-  qx_ci = qx_ci(fit, age = age, Ex = Ex, prob = prob)
+  #### ----
+  qx_fit = qx_ci = fitted(fit, age = age, Ex = Ex, prob = prob)
 
   ## Customizing the plot
   if(is.null(colors)) { colors = "seagreen" }
@@ -100,7 +99,7 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
     new_colors = colors
   }
 
-  ## Life table's lower limit:
+  ## lower limit:
   li_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
 
   if(!is.null(age)) { data = data[data$x %in% age, ] }
@@ -109,7 +108,7 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
   g <- ggplot2::ggplot() +
     ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(li_y,0), limits = 10^-c(li_y,0), labels = scales::comma) +
     ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-    ggplot2::xlab("Age") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+    ggplot2::xlab("Age") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
     ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                    axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                    axis.title.y = ggplot2::element_text(color = 'black', size = 12),
@@ -161,8 +160,8 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
                           labels = NULL, colors = NULL, linetype = NULL,
                           prob = 0.95, ...){
   fit = x
-  qx_fit = na.omit(fitted(fit, age = age))
-  qx_ci = na.omit(qx_ci(fit, age = age, Ex = Ex, prob = prob))
+  qx_fit = qx_ci = na.omit(fitted(fit, age = age, prob = prob))
+
 
   ## Customizing the plot
   ## Customizing the plot
@@ -201,7 +200,7 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
     new_colors = colors
   }
 
-  ## Life table's lower limit:
+  ## lower limit:
   li_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
 
   if(!is.null(age)) { data = data[data$x %in% age, ] }
@@ -210,7 +209,7 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
   g <- ggplot2::ggplot() +
     ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(li_y,0), limits = 10^-c(li_y,0), labels = scales::comma) +
     ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-    ggplot2::xlab("Age") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+    ggplot2::xlab("Age") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
     ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                    axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                    axis.title.y = ggplot2::element_text(color = 'black', size = 12),

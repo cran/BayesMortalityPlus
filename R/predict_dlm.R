@@ -1,7 +1,7 @@
 #' @name predict.DLM
 #' @rdname predict.DLM
 #'
-#' @title Prediction of death probability for a fitted DLM
+#' @title DLM: Prediction of death probability
 #'
 #' @description Extrapolates the mortality curve fitted by DLM by calculating the median
 #' of death probability and the respective prediction interval.
@@ -24,8 +24,8 @@
 #' Ex = USA2000$Ex.Total[x+1]
 #' Dx = USA2000$Dx.Total[x+1]
 #'
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
+#' mx_t = Dx/Ex
+#' qx_t = 1 - exp(-mx_t)
 #' y = log(qx_t)
 #'
 #' ## Fitting dlm
@@ -54,7 +54,7 @@ predict.DLM <- function(object, h, prob = 0.95, ...){
   V = fit$sig2
   n = length(V)
 
-  sim <- matrix(NA, nrow = n, ncol = h)
+  sim <- matrix(NA_real_, nrow = n, ncol = h)
 
   for(i in 1:n){
     aux = ff(m0 = fit$info$prior$m0, C0 = fit$info$prior$C0, y = as.matrix(y),
@@ -63,20 +63,20 @@ predict.DLM <- function(object, h, prob = 0.95, ...){
     Wt = aux$C[N,,] * (1 - delta) / delta
     at = Gt %*% aux$m[N,]
     Rt = Gt %*% aux$C[N,,] %*% t(Gt) + Wt
-    ft = Ft %*% aux$a[N,]
+    ft = Ft %*% at
     Qt = Ft %*% Rt %*% t(Ft) + V[i]
-    At = Rt %*% t(Ft) %*% solve(Qt)
+    At = Rt %*% t(Ft) %*% chol2inv(chol(Qt))
     Ct = Rt - At %*% Ft %*% Rt   ## second moment
 
     sim[i, 1] <- MASS::mvrnorm(1, ft, Qt)
 
     if(h > 1) for(k in 2:h){
-      Wt = Ct * (1 - delta) / delta ## Confirmar essa linha
+      Wt = Ct * (1 - delta) / delta
       at = Gt %*% at
       Rt = Gt %*% Rt %*% t(Gt) + Wt
       ft = Ft %*% at
       Qt = Ft %*% Rt %*% t(Ft) + V[i]
-      At = Rt %*% t(Ft) %*% solve(Qt)
+      At = Rt %*% t(Ft) %*% chol2inv(chol(Qt))
       Ct = Rt - At %*% Ft %*% Rt   ## second moment
 
       sim[i, k] <- MASS::mvrnorm(1, ft, Qt)
@@ -92,3 +92,4 @@ predict.DLM <- function(object, h, prob = 0.95, ...){
   return(data.frame(Ages = qx_fitted$Ages, qx_fitted = qx_fitted$qx_fitted,
                     qx_inf = qx_lim[1,], qx_sup = qx_lim[2,]))
 }
+

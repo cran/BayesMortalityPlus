@@ -2,7 +2,7 @@
 % Please edit documentation in R/expectancy_hp.R
 \name{expectancy.HP}
 \alias{expectancy.HP}
-\title{HP Model: Life expectancy}
+\title{HP: Life expectancy}
 \usage{
 \method{expectancy}{HP}(
   x,

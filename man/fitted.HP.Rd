@@ -2,19 +2,23 @@
 % Please edit documentation in R/fitted_hp.R
 \name{fitted.HP}
 \alias{fitted.HP}
-\title{HP Model: Fitted death probabilities (qx)}
+\title{HP: Fitted death probabilities (qx)}
 \usage{
-\method{fitted}{HP}(object, age = NULL, ...)
+\method{fitted}{HP}(object, age = NULL, Ex = NULL, prob = 0.95, ...)
 }
 \arguments{
 \item{object}{Object of the class \code{HP} or \code{ClosedHP} adjusted by the hp() or hp_close() functions.}
 
 \item{age}{Vector with the ages to calculate the death probabilities (Optional). By default, all ages are considered.}
 
+\item{Ex}{Vector with the exposures of the selected ages. Its length must be equal to the age vector. This argument is only necessary when using the Poisson and the Binomial distributions.}
+
+\item{prob}{Coverage probability of the predictive intervals.}
+
 \item{...}{Other arguments.}
 }
 \value{
-A data.frame object with the selected ages and the corresponding death probabilities.
+A data.frame object with the selected ages and the corresponding estimates and predictive intervals of the death probabilities.
 }
 \description{
 This function computes the point estimations of the death probabilities (qx) of the \code{HP} or the \code{ClosedHP} class object fitted by the hp() or hp_close() functions.
@@ -34,7 +38,7 @@ fit = hp(x = x, Ex = Ex, Dx = Dx, M = 5000, bn = 0, thin = 10)
 
 ## Estimating the death probabilities (qx)
 fitted(fit)
-fitted(fit, age = 0:110)
+fitted(fit, age = 0:110, Ex = USA2000$Ex.Total[0:110+1])
 
 }
 \seealso{

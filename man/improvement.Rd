@@ -2,14 +2,14 @@
 % Please edit documentation in R/improvement.R
 \name{improvement}
 \alias{improvement}
-\title{Improvement for BLC fitted models}
+\title{BLC: Improvement}
 \usage{
-improvement(obj, cred = 0.95)
+improvement(obj, prob = 0.95)
 }
 \arguments{
 \item{obj}{A \code{BLC} object, result of a call to blc() function.}
 
-\item{cred}{A real number that represents the credibility level of the intervals.}
+\item{prob}{A real number that represents the credibility level of the intervals.}
 }
 \value{
 A data.frame with the improvement values of each age, as well as their credible intervals.
@@ -23,11 +23,11 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Improvement:
 improvement(fit)
-improvement(fit, cred = 0.9) #90\% credible intervals
+improvement(fit, prob = 0.9) #90\% credible intervals
 
 
 }

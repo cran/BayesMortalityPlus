@@ -1,7 +1,7 @@
 #' @name summary.HP
 #' @rdname summary.HP
 #'
-#' @title Summary for HP fitted models
+#' @title HP: Summary
 #'
 #' @description Summarizes information from the parameters' markov chains of a fitted `HP` or `ClosedHP` model.
 #'

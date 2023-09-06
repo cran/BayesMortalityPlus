@@ -1,7 +1,7 @@
 #' @name predict.BLC
 #' @rdname predict.BLC
 #'
-#' @title Forecast for fitted BLC models
+#' @title BLC: Forecasting
 #'
 #' @description Calculates the means and variances of the forecast distributions based on
 #' the resulting chains from an estimation method.
@@ -20,7 +20,7 @@
 #' Y <- PT
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #'
 #' ## Prediction for 2 years ahead
 #' pred = predict(fit, h = 2)
@@ -28,7 +28,7 @@
 #'
 #' @importFrom MASS mvrnorm
 #'
-#' @seealso [fitted.BLC()], [print.BLC()], and [plot.BLC()] for `PredBLC` methods to native R functions [fitted()],
+#' @seealso [fitted.BLC()], [print.BLC()], and [plot.PredBLC()] for `PredBLC` methods to native R functions [fitted()],
 #'[print()], and [plot()].
 #'
 #'[expectancy.BLC()] and [Heatmap.BLC] to compute and plot the life expectancy of the prediction(s).
@@ -39,14 +39,14 @@ predict.BLC <- function(object, h, ...) {
 	N <- ncol(obj$Y)
 	q <- nrow(obj$beta)
 
-	sim <- array(dim = c(obj$numit - obj$warmup, h, q))
+	sim <- array(dim = c(obj$M - obj$bn, h, q))
 
-	for (l in 1:(obj$numit - obj$warmup)) {
-		est.alpha <- obj$alpha[ ,l + obj$warmup]
-		est.beta <- obj$beta[ ,l + obj$warmup]
-		est.V <- diag(1/obj$phiv[ ,l + obj$warmup])
-		est.theta <- obj$theta[l + obj$warmup]
-		est.W <- 1/obj$phiw[l + obj$warmup]
+	for (l in 1:(obj$M - obj$bn)) {
+		est.alpha <- obj$alpha[ ,l + obj$bn]
+		est.beta <- obj$beta[ ,l + obj$bn]
+		est.V <- diag(1/obj$phiv[ ,l + obj$bn])
+		est.theta <- obj$theta[l + obj$bn]
+		est.W <- 1/obj$phiw[l + obj$bn]
 
 		Gt <- 1
 

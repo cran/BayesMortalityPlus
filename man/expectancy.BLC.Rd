@@ -2,16 +2,16 @@
 % Please edit documentation in R/expectancy_blc.R
 \name{expectancy.BLC}
 \alias{expectancy.BLC}
-\title{Life Expectancy for fitted models and forecast}
+\title{BLC: Life expectancy}
 \usage{
-\method{expectancy}{BLC}(x, at = NULL, cred = 0.95, ...)
+\method{expectancy}{BLC}(x, at = NULL, prob = 0.95, ...)
 }
 \arguments{
 \item{x}{A \code{BLC} or \code{PredBLC} object.}
 
 \item{at}{A number that determines at which age the expectancy life is calculated based on the ages used in fit or prediction. For instance, at = 0 is related to the first age used in fitted model.}
 
-\item{cred}{A number that specifies the probability of the credible interval. Default is '0.95'.}
+\item{prob}{A number that specifies the probability of the credible interval. Default is '0.95'.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
@@ -27,7 +27,7 @@ data(PT)
 Y <- PT
 
 ## Fitting the model
-fit = blc(Y = Y, numit = 100, warmup = 20)
+fit = blc(Y = Y, M = 100, bn = 20)
 
 ## Life expectancy for the years used in model fitted
 expectancy(fit)

@@ -2,11 +2,11 @@
 % Please edit documentation in R/heatmap_dlm.R
 \name{Heatmap.DLM}
 \alias{Heatmap.DLM}
-\title{DLM: Heatmap for the life expectancy.}
+\title{DLM: Heatmap for the life expectancy}
 \usage{
 \method{Heatmap}{DLM}(
   x,
-  x_lab,
+  x_lab = NULL,
   age = NULL,
   max_age = 110,
   color = c("red", "white", "blue"),
@@ -42,10 +42,7 @@ USA2010 = USA[USA$Year == 2010,]
 
 ExF = USA2010$Ex.Female[1:91]
 DxF = USA2010$Dx.Female[1:91]
-
-qx_tF <- DxF/ExF
-qx_tF <- 1 - exp(-qx_tF)
-yF <- log(qx_tF)
+yF = log(DxF/ExF)
 
 fitF <- dlm(yF, M = 100, bn = 20, thin = 1)
 

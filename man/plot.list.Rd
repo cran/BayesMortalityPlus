@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_list.R
 \name{plot.list}
 \alias{plot.list}
-\title{Plot a set of life tables.}
+\title{Plot a set of life tables}
 \usage{
 \method{plot}{list}(
   x,

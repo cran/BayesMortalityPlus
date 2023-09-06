@@ -2,21 +2,21 @@
 % Please edit documentation in R/print_blc.R
 \name{print.BLC}
 \alias{print.BLC}
-\title{Print Values for BLC fitted models}
+\title{BLC: Print}
 \usage{
 \method{print}{BLC}(x, ...)
 }
 \arguments{
-\item{x}{A \code{BLC} object, result of a call to blc() function.}
+\item{x}{A \code{BLC} or \code{PredBLC}object, result of a call to blc() or predict() function.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-A character vector with the details of a fitted \code{BLC} model.
+A character vector with the details of a fitted \code{BLC} or \code{PredBLC} model.
 }
 \description{
 Print details from a fitted BLC model and returns it invisibly.
 }
 \seealso{
-\code{\link[=print.DLM]{print.DLM()}}, \code{\link[=print.HP]{print.HP()}} and \code{\link[=print.PredBLC]{print.PredBLC()}} for \code{DLM}, \code{HP} or \code{PredBLC} methods.
+\code{\link[=print.DLM]{print.DLM()}} and \code{\link[=print.HP]{print.HP()}} for \code{DLM} or \code{HP} methods.
 }

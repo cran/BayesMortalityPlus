@@ -16,7 +16,7 @@ dlm(y, Ft = matrix(c(1,0), nrow = 1), Gt = matrix(c(1,0,1,1), 2),
 
 \item{Gt}{pxp Matrix that specifies the system equations. By default, Gt = matrix(c(1,0,1,1), 2).}
 
-\item{delta}{Positive number in '(0, 1)' interval specifying the discount factor. A higher value of delta results in a higher smoothness of the fitted curve. By default, delta is '0.65'.}
+\item{delta}{Positive number in '(0, 1)' interval specifying the discount factor. A higher value of delta results in a higher smoothness of the fitted curve. By default, delta is '0.85'.}
 
 \item{prior}{A list with the prior mean vector \eqn{(m_0)} and covariance matrix \eqn{(C_0)} of \eqn{\theta_0} (state vector at time (age) t = 0). By default mean of zeros and diagonal matrix with a common variance 100 is used. Each element of the list must be named accordingly with the parameter (m0 for mean vector and C0 for covariance matrix).}
 
@@ -84,9 +84,7 @@ USA2010 = USA[USA$Year == 2010,]
 x = 0:100
 Ex = USA2010$Ex.Male[x+1]
 Dx = USA2010$Dx.Male[x+1]
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting DLM
 fit = dlm(y, M = 100, bn = 20, thin = 1)
@@ -103,8 +101,6 @@ fitted(fit)
 ## chain's plot (See "?plot_chain" for more options):
 plot_chain(fit, param = c("mu[0]", "mu[100]"))
 
-## credible intervals (See "?qx_ci" for more options):
-qx_ci(fit)
 
 }
 \references{
@@ -119,5 +115,5 @@ via \code{\link[=expectancy]{expectancy()}} and \code{\link[=Heatmap]{Heatmap()}
 
 \code{\link[=dlm_close]{dlm_close()}} for close methods to expand the life tables.
 
-\code{\link[=qx_ci]{qx_ci()}} and \code{\link[=plot_chain]{plot_chain()}} to compute credible intervals and visualise the markov chains, respectively.
+\code{\link[=plot_chain]{plot_chain()}} to visualise the markov chains, respectively.
 }

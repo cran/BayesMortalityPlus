@@ -1,7 +1,7 @@
 #' @name plot.DLM
 #' @rdname plot.DLM
 #'
-#' @title DLM: Plot the life table.
+#' @title DLM: Plot the life table
 #'
 #' @description Function that returns a log-scale ggplot of the `DLM` and `ClosedDLM` objects returned by dlm() and dlm_close() functions.
 #'
@@ -24,9 +24,7 @@
 #' x = 0:100
 #' Ex = USA1990$Ex.Male[x+1]
 #' Dx = USA1990$Dx.Male[x+1]
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
-#' y = log(qx_t)
+#' y = log(Dx/Ex)
 #'
 #' ## Fitting DLM
 #' fit = dlm(y, ages = 0:100, M = 100, bn = 20, thin = 1)
@@ -47,7 +45,6 @@
 #' }
 #'
 #'
-#' @include qx_ci.R
 #' @include fitted_dlm.R
 #' @include fun_aux.R
 #'
@@ -80,12 +77,11 @@ plot.DLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
   aux = which(fit$info$ages %in% age)
   fit$mu = fit$mu[,aux]
   fit$beta = fit$beta[,aux]
-  fit$info$y = fit$info$y[aux]
+  fit$info$y = c(fit$info$y)[aux]
   fit$info$ages = fit$info$ages[aux]
 
-  ## fitted qx and ic
-  qx_fit = na.omit(fitted(fit))
-  qx_ci = na.omit(qx_ci(fit, prob = prob))
+  ## fitted qx and ci
+  qx_fit = qx_ci = na.omit(fitted(fit, prob = prob))
   if(h > 0) {
     qx_pred <- predict(fit, h = h)
     aux_last_age = max(qx_fit$age)
@@ -117,13 +113,13 @@ plot.DLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
   }
 
   ## data
-  qx = exp(fit$info$y)
+  qx = 1-exp(-exp(fit$info$y))
 
   if(plotData){
     if(h == 0){
       df = na.omit(data.frame(qx = qx, ages = age))
     }else{
-      df = na.omit(data.frame(qx = c(qx, rep(NA, h)), ages = age))
+      df = na.omit(data.frame(qx = c(qx, rep(NA_real_, h)), ages = age))
     }
     new_labels <- append(labels, "data", 0)
     new_colors <- append(colors, "gray10", 0)
@@ -138,7 +134,7 @@ plot.DLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
     new_colors = colors
   }
 
-  ## Life table's lower limit:
+  ## lower limit:
   limits_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], qx[qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
 
   ## Plot base:
@@ -146,7 +142,7 @@ plot.DLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
     ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(limits_y,0),
                                 limits = 10^-c(limits_y,0), labels = scales::comma) +
     ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-    ggplot2::xlab("Age") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+    ggplot2::xlab("Age") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
     ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                    axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                    axis.title.y = ggplot2::element_text(color = 'black', size = 12),
@@ -210,12 +206,11 @@ plot.ClosedDLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
   ## selecting just the columns of the ages specified by the user
   aux = which(fit$info$ages %in% age)
   fit$qx = fit$qx[,aux]
-  fit$info$y = fit$info$y[aux]
+  fit$info$y = c(fit$info$y)[aux]
   fit$info$ages = fit$info$ages[aux]
 
-  ## fitted qx and ic
-  qx_fit = na.omit(fitted(fit))
-  qx_ci = na.omit(qx_ci(fit, prob = prob))
+  ## fitted qx and ci
+  qx_fit = qx_ci = na.omit(fitted(fit, prob = prob))
 
   ## Customizing the plot
   if(is.null(colors)) { colors = "seagreen" }
@@ -236,7 +231,7 @@ plot.ClosedDLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
   }
 
   ## data
-  qx = exp(fit$info$y)
+  qx = 1-exp(-exp(fit$info$y))
 
   if(plotData){
     df = na.omit(data.frame(qx = qx, ages = age))
@@ -253,7 +248,7 @@ plot.ClosedDLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
     new_colors = colors
   }
 
-  ## Life table's lower limit:
+  ## lower limit:
   limits_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], qx[qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
 
   ## Plot base:
@@ -261,7 +256,7 @@ plot.ClosedDLM <- function(x, plotIC = TRUE, plotData = TRUE, labels = NULL,
     ggplot2::scale_y_continuous(trans = 'log10', breaks = 10^-seq(limits_y,0),
                                 limits = 10^-c(limits_y,0), labels = scales::comma) +
     ggplot2::scale_x_continuous(breaks = seq(0, 200, by = 10), limits = c(NA, NA)) +
-    ggplot2::xlab("Age") + ggplot2::ylab("Qx") + ggplot2::theme_bw() +
+    ggplot2::xlab("Age") + ggplot2::ylab("qx") + ggplot2::theme_bw() +
     ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
                    axis.title.x = ggplot2::element_text(color = 'black', size = 12),
                    axis.title.y = ggplot2::element_text(color = 'black', size = 12),

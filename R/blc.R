@@ -1,18 +1,18 @@
-#' @title Lee-Carter Bayesian Estimation
+#' @title Lee-Carter Bayesian Estimation for mortality data
 #'
 #' @description Performs Bayesian estimation of the Lee-Carter model considering different
 #' variances for each age.
 #'
 #' @usage
-#' blc(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000)
+#' blc(Y, prior = NULL, init = NULL, M = 2000, bn = 1000)
 #'
 #' @param Y Log-mortality rates for each age.
 #' @param prior A list containing the prior mean \eqn{m_0} and the prior
 #' variance \eqn{C_0}.
 #' @param init A list containing initial values for \eqn{\alpha}, \eqn{\beta},
 #' \eqn{\phi_V}, \eqn{\phi_W} and \eqn{\theta}.
-#' @param numit The number of iterations.
-#' @param warmup The number of initial iterations from the Gibbs sampler that should be discarded. Default considers half the number of iterations.
+#' @param M The number of iterations.
+#' @param bn The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). Default considers half the number of iterations.
 #'
 #' @details
 #' Let \eqn{Y_{it}} be the log mortality rate at age \eqn{i} and time \eqn{t}. The Lee-Carter
@@ -49,8 +49,8 @@
 #' \item{phiw}{Posterior sample from phiw. phiw is the precision of the random error of the random walk.}
 #' \item{kappa}{Sampling from the state variables.}
 #' \item{Y}{Y Log-mortality rates for each age passed by the user to fit the model.}
-#' \item{warmup}{The warmup of the algorithm specified by the user to fit the model.}
-#' \item{numit}{The number of iterations specified by the user to fit the model.}
+#' \item{bn}{The warmup of the algorithm specified by the user to fit the model.}
+#' \item{M}{The number of iterations specified by the user to fit the model.}
 #' \item{m0}{The prior mean of kappa0.}
 #' \item{C0}{The prior covariance matrix of kappa0.}
 #'
@@ -68,19 +68,19 @@
 #' require(tidyr)
 #' require(magrittr)
 #'
-#' USA %>% mutate(qx = USA$Dx.Total/USA$Ex.Total) -> data
+#' USA %>% mutate(mx = USA$Dx.Total/USA$Ex.Total) -> data
 #'
 #' data %>%
 #' 	filter(Age %in% 18:80 & Year %in% 2000:2015)  %>%
-#' 	mutate(logqx = log(qx)) %>%
-#' 	dplyr::select(Year,Age,logqx) %>%
-#' 	pivot_wider(names_from = Year, values_from = logqx) %>%
+#' 	mutate(logmx = log(mx)) %>%
+#' 	dplyr::select(Year,Age,logmx) %>%
+#' 	pivot_wider(names_from = Year, values_from = logmx) %>%
 #' 	dplyr::select(-Age) %>%
 #' 	as.matrix()  %>%
 #' 	magrittr::set_rownames(18:80) -> Y
 #'
 #' ## Fitting the model
-#' fit = blc(Y = Y, numit = 100, warmup = 20)
+#' fit = blc(Y = Y, M = 100, bn = 20)
 #' print(fit)
 #'
 #' ## Viewing the results
@@ -103,7 +103,7 @@
 #'
 #'
 #' @export
-blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
+blc <- function(Y, prior = NULL, init = NULL, M = 2000, bn = 1000) {
 	# -------- Type validation --------
 
 	if (mode(Y) != "numeric")
@@ -133,14 +133,14 @@ blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
 	if (length(init.types) != 1 || init.types[1] != "numeric")
 		stop("Expected `init` to only contain numerics")
 
-	if (mode(numit) != "numeric" || round(numit) != numit || numit <= 0)
-		stop("Expected `numit` to be a positive integer")
+	if (mode(M) != "numeric" || round(M) != M || M <= 0)
+		stop("Expected `M` to be a positive integer")
 
 	# if (mode(std.type) != "character" || !(std.type %in% c("incl", "beta")))
 	# 	stop("Expected `std` to be one of 'incl' or 'beta'")
 
-	if (!(mode(warmup) %in% c("NULL", "numeric")))
-		stop("Expected `warmup` to be either nil or numeric")
+	if (!(mode(bn) %in% c("NULL", "numeric")))
+		stop("Expected `bn` to be either nil or numeric")
 
 	# -------- List validation --------
 
@@ -183,17 +183,17 @@ blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
 
 	std.type = "incl"
 
-	## Barra de progresso
-	pb  = progress::progress_bar$new(format = "Simulating [:bar] :percent in :elapsed",total = numit, clear = FALSE, width = 60)
+	## Progress Bar
+	pb  = progress::progress_bar$new(format = "Simulating [:bar] :percent in :elapsed",total = M, clear = FALSE, width = 60)
 
 	# Allocate storage
 	chain <- list()
-	chain$alpha <- matrix(nrow = m, ncol = numit)
-	chain$beta <- matrix(nrow = m, ncol = numit)
-	chain$phiv <- matrix(nrow = m, ncol = numit)
-	chain$theta <- numeric(numit)
-	chain$phiw <- numeric(numit)
-	chain$kappa <- matrix(nrow = N, ncol = numit)
+	chain$alpha <- matrix(nrow = m, ncol = M)
+	chain$beta <- matrix(nrow = m, ncol = M)
+	chain$phiv <- matrix(nrow = m, ncol = M)
+	chain$theta <- numeric(M)
+	chain$phiw <- numeric(M)
+	chain$kappa <- matrix(nrow = N, ncol = M)
 
 	pb$tick() ## Progress Bar
 
@@ -206,7 +206,7 @@ blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
 
 	# -------- Gibbs --------
 
-	for (i in 2:numit) {
+	for (i in 2:M) {
 
 	  pb$tick() ## Progress Bar
 
@@ -230,7 +230,7 @@ blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
 
 			# Generate alpha and beta
 			X <- cbind(1, chain$kappa[ ,i])
-			aux.reg <- solve(t(X) %*% X)
+			aux.reg <- chol2inv(chol(t(X) %*% X))
 			mean.reg <- aux.reg %*% t(X) %*% Y[j, ]
 			var.reg <- (1 / chain$phiv[j,i]) * aux.reg
 			tmp <- mvrnorm(1, mean.reg, var.reg)
@@ -254,8 +254,8 @@ blc <- function(Y, prior = NULL, init = NULL, numit = 2000, warmup = 1000) {
 
 	class(chain) <- "BLC"
 	chain$Y <- Y
-	chain$warmup <- if (is.null(warmup)) ceiling(numit/2) else warmup
-	chain$numit <- numit
+	chain$bn <- if (is.null(bn)) ceiling(M/2) else bn
+	chain$M <- M
 	chain$m0 <- prior$m0
 	chain$C0 <- prior$C0
 

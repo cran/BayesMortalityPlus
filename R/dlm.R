@@ -17,7 +17,7 @@
 #' @param y Numeric vector of log mortality rates.
 #' @param Ft 1xp Matrix that specifies the observation equation, where p is the number of parameters. By default, 'Ft = matrix(c(1,0), nrow = 1)'.
 #' @param Gt pxp Matrix that specifies the system equations. By default, Gt = matrix(c(1,0,1,1), 2).
-#' @param delta Positive number in '(0, 1)' interval specifying the discount factor. A higher value of delta results in a higher smoothness of the fitted curve. By default, delta is '0.65'.
+#' @param delta Positive number in '(0, 1)' interval specifying the discount factor. A higher value of delta results in a higher smoothness of the fitted curve. By default, delta is '0.85'.
 #' @param prior A list with the prior mean vector \eqn{(m_0)} and covariance matrix \eqn{(C_0)} of \eqn{\theta_0} (state vector at time (age) t = 0). By default mean of zeros and diagonal matrix with a common variance 100 is used. Each element of the list must be named accordingly with the parameter (m0 for mean vector and C0 for covariance matrix).
 #' @param prior.sig2 A list with the prior parameters (a, b) of Inverted Gamma distribution for \eqn{\sigma^2}. Each element of the list must be named accordingly with the parameter (a for shape parameter and b for scale parameter).
 #' @param M Positive integer indicating the number of iterations of the MCMC run.
@@ -72,9 +72,7 @@
 #' x = 0:100
 #' Ex = USA2010$Ex.Male[x+1]
 #' Dx = USA2010$Dx.Male[x+1]
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
-#' y = log(qx_t)
+#' y = log(Dx/Ex)
 #'
 #' ## Fitting DLM
 #' fit = dlm(y, M = 100, bn = 20, thin = 1)
@@ -91,8 +89,6 @@
 #' ## chain's plot (See "?plot_chain" for more options):
 #' plot_chain(fit, param = c("mu[0]", "mu[100]"))
 #'
-#' ## credible intervals (See "?qx_ci" for more options):
-#' qx_ci(fit)
 #'
 #' @include ffbs.R
 #'
@@ -104,7 +100,7 @@
 #'
 #'[dlm_close()] for close methods to expand the life tables.
 #'
-#'[qx_ci()] and [plot_chain()] to compute credible intervals and visualise the markov chains, respectively.
+#'[plot_chain()] to visualise the markov chains, respectively.
 #'
 #' @export
 dlm <- function(y, Ft = matrix(c(1,0), nrow = 1), Gt = matrix(c(1,0,1,1), 2), delta = 0.85,
@@ -112,7 +108,7 @@ dlm <- function(y, Ft = matrix(c(1,0), nrow = 1), Gt = matrix(c(1,0,1,1), 2), de
                 prior.sig2 = list(a = 0.01, b = 0.01), M = 5000, bn = 3000, thin = 1,
                 ages = 0:(length(y)-1)){
 
-  ## Verificacoes
+  ## Validation
   if(is.vector(Ft)) {Ft = t(as.matrix(Ft))}
   if(nrow(Ft) != 1) stop("Ft must be a matrix with the following dimensions: 1 row and p columns.")
   if(!(is.matrix(Gt))) {Gt = as.matrix(Gt)}
@@ -122,8 +118,6 @@ dlm <- function(y, Ft = matrix(c(1,0), nrow = 1), Gt = matrix(c(1,0,1,1), 2), de
   if(nrow(prior$C) != nrow(Gt)) stop("Dimension of prior covariance matrix does not match the dimension of matrix Gt.")
   if(ncol(prior$C) != nrow(Gt)) stop("Dimension of prior covariance matrix does not match the dimension of matrix Gt.")
   if(delta <= 0 || delta >= 1) stop("delta must be in interval (0,1).")
-
-  # Ft0 = matrix(rep(Ft, each = length(y)), ncol = length(Ft))
 
   ## Initial value for sigma2
   sig2k <- runif(1)
