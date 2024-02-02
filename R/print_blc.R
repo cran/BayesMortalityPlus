@@ -22,7 +22,7 @@ print.BLC <- function(x, ...) {
 	catf("Bayesian Lee-Carter Estimation\n")
 	catf("Age groups: %d", nrow(obj$Y))
 	catf("Time length: %d", ncol(obj$Y))
-	catf("Iterations: %d (%d for warm-up)", obj$M, obj$bn)
+	catf("Sample size: %d", obj$M)
 	catf("Prior: N(%.2f, %.2e)", obj$m0, obj$C0)
 
 	invisible(obj)

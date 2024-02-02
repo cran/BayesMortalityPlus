@@ -38,6 +38,7 @@
 #' @export
 fitted.HP <- function(object, age = NULL, Ex = NULL, prob = 0.95, ...){
 
+  set.seed(123) ## Set seed to reproducibility
   fit = object
 
   ## checking if age and Ex were inputed by the user
@@ -127,12 +128,12 @@ fitted.HP <- function(object, age = NULL, Ex = NULL, prob = 0.95, ...){
   qs = apply(qx_ic, 2, quantile, (1+prob)/2, na.rm = T)
   qx_fitted = apply(qx_fitted, 2, median, na.rm = T)
 
-  aux = data.frame(age = age, qx_fitted = qx_fitted, qi = qi, qs = qs)
-  aux[!(aux$qi > 0), 3] = 0
-  aux[!(aux$qs < 1), 4] = 1
+  aux = data.frame(age = age, qx.fitted = qx_fitted, qx.lower = qi, qx.upper = qs)
+  aux[!(aux$qx.lower > 0), 3] = 0
+  aux[!(aux$qx.upper < 1), 4] = 1
 
   if(length(age_out) > 0){
-    aux2 <- data.frame(age = age_out, qx_fitted = NA_real_, qi = NA_real_, qs = NA_real_)
+    aux2 <- data.frame(age = age_out, qx.fitted = NA_real_, qx.lower = NA_real_, qx.upper = NA_real_)
     aux <- rbind(aux, aux2)
     aux <- aux[order(aux$age),]
   }
@@ -147,7 +148,7 @@ fitted.ClosedHP <- function(object, age = NULL, prob = 0.95, ...){
 
   if(fit$method == "Mix"){
     qx_fitted = apply(fit$qx, 2, median)
-    return(data.frame(age = fit$data$x, qx_fitted = qx_fitted, qi = NA_real_, qs = NA_real_))
+    return(data.frame(age = fit$data$x, qx.fitted = qx_fitted, qx.lower = NA_real_, qx.upper = NA_real_))
   }
 
   qx_fitted = fit$qx
@@ -158,7 +159,7 @@ fitted.ClosedHP <- function(object, age = NULL, prob = 0.95, ...){
   qs = apply(qx_fitted, 2, quantile, (1+prob)/2, na.rm = T)
   qx_fitted = apply(qx_fitted, 2, median, na.rm = T)
 
-  df = data.frame(age = close_age, qx_fitted = qx_fitted, qi = qi, qs = qs)
+  df = data.frame(age = close_age, qx.fitted = qx_fitted, qx.lower = qi, qx.upper = qs)
   df[!(df$qi > 0), 3] = 0
   df[!(df$qs < 1), 4] = 1
 
@@ -168,7 +169,7 @@ fitted.ClosedHP <- function(object, age = NULL, prob = 0.95, ...){
 
     if(any(!(age %in% close_age))){
       age_not_fitted = age[!(age %in% close_age)]
-      aux = data.frame(age = age_not_fitted, qx_fitted = NA_real_, qi = NA_real_, qs = NA_real_)
+      aux = data.frame(age = age_not_fitted, qx.fitted = NA_real_, qx.lower = NA_real_, qx.upper = NA_real_)
       df = rbind(df, aux); row.names(df) = NULL
     }
 

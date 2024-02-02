@@ -100,7 +100,7 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
   }
 
   ## lower limit:
-  li_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
+  li_y <- decimal(min(c(qx_ci$qx.lower[qx_ci$qx.lower > 0], data$qx[data$qx > 0], qx_fit$qx.fitted[qx_fit$qx.fitted > 0]), na.rm = T))
 
   if(!is.null(age)) { data = data[data$x %in% age, ] }
 
@@ -119,8 +119,8 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
   if(plotIC){
     if(plotData){
       g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = "data"), alpha = 1, size = 0.8) +
-        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = "fitted"), alpha = 0.3) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = "fitted"), alpha = 0.3) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_fill_manual(name = NULL, values = colors) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype) +
@@ -129,8 +129,8 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
                                                                           shape = c(19, NA))))
     }else{
       g +
-        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = "fitted"), alpha = 0.3) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = "fitted"), alpha = 0.3) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_fill_manual(name = NULL, values = colors) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
@@ -139,7 +139,7 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
   }else{
     if(plotData){
       g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = "data"), alpha = 1, size = 0.8) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
         ggplot2::guides(fill = "none", lty = "none",
@@ -147,7 +147,7 @@ plot.HP <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
                                                                           shape = c(19, NA))))
     }else{
       g +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
         ggplot2::guides(fill = "none")
@@ -201,7 +201,7 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
   }
 
   ## lower limit:
-  li_y <- decimal(min(c(qx_ci$qi[qx_ci$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
+  li_y <- decimal(min(c(qx_ci$qx.lower[qx_ci$qx.lower > 0], data$qx[data$qx > 0], qx_fit$qx.fitted[qx_fit$qx.fitted > 0]), na.rm = T))
 
   if(!is.null(age)) { data = data[data$x %in% age, ] }
 
@@ -220,8 +220,8 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
   if(plotIC){
     if(plotData){
       g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = "data"), alpha = 1, size = 0.8) +
-        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = "fitted"), alpha = 0.3) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = "fitted"), alpha = 0.3) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_fill_manual(name = NULL, values = colors) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype) +
@@ -230,8 +230,8 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
                                                                           shape = c(19, NA))))
     }else{
       g +
-        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = "fitted"), alpha = 0.3) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_ribbon(data = qx_ci, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = "fitted"), alpha = 0.3) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_fill_manual(name = NULL, values = colors) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
@@ -240,7 +240,7 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
   }else{
     if(plotData){
       g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = "data"), alpha = 1, size = 0.8) +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype) +
         ggplot2::guides(fill = "none", lty = "none",
@@ -248,7 +248,7 @@ plot.ClosedHP <- function(x, age = NULL, plotIC = TRUE, plotData = TRUE,
                                                                           shape = c(19, NA))))
     }else{
       g +
-        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
+        ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = "fitted", lty = "fitted"), linewidth = 0.8, alpha = 0.8) +
         ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
         ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
         ggplot2::guides(fill = "none")

@@ -18,14 +18,42 @@
 #' @param x0 Integer with the starting age the closing method will be fitted from. Default is the last age fitted by the 'HP' object.
 #' @param max_age Integer with the maximum age the closing method will be fitted. Default age is '120'.
 #' @param k Integer representing the size of the age interval to be mixed with the 'linear' or 'gompertz' closing methods for smooth graduation. If k = 0, no mixing will be applied.
-#' @param weights Vector of weights to be applied in the mixing of the life tables. Vector's size should be equal to 2*k+1.
-#' @param new_Ex Exposure in the period after the x0 input. This argument is necessary for HP objects following the binomial and poisson distributions, as well as the 'linear' and 'gompertz' closing methods (optional).
-#' @param new_Dx Vector containing the death counts in the period after the x0 input. This argument is necessary in the 'linear' and 'gompertz' closing methods, being equal in length with the new_Ex argument.
+#' @param weights Vector of weights of the closing method used in the mixture of the closing method and the fitted model made in the mixing age group. The vector's size should be equal to 2k+1. For a better understanding of this parameter and the mixture applied in this function, see Details.
+#' @param new_Ex Vector with exposure of ages after the x0 input. This is an optional argument used in the 'linear' and 'gompertz' closing methods. If this argument is specified, then new_Dx also needs to be.
+#' @param new_Dx Vector containing the death counts of the ages after the x0 input. This is also an optional argument used in the 'linear' and 'gompertz' closing methods. The length must be the same as new_Ex.
 #'
-#' @details The four closing methods for life tables are:
+#' @details
+#' There are three types of age groups when the closing method is applied: a group
+#' where only the HP-fitted model computes the death probabilities, followed by a
+#' group in which the death probabilities are a mix (or more precise a weighted mean)
+#' from the HP model and the closing method and followed by a group in which the
+#' death probabilities are computed just by the closing method. The mix is applied
+#' so the transition of the death probabilities of the ages between the fitted model
+#' and the closing method occurs smoothly.
+#'
+#' The parameters 'x0' and 'k' define the mixing group age. The parameter 'x0'
+#' indicates the center age of the group. The parameter 'k' is the range of ages
+#' before 'x0' and after 'x0', so this group has a total of \eqn{2k + 1} age. Therefore,
+#' the parameter 'weights' must have a length size equal to \eqn{2k + 1}. In this case,
+#' the death probability is calculated as follows. Consider \eqn{model_x} and \eqn{close_x}
+#' as the death probability of the fitted model and closing method in the age \eqn{x},
+#' respectively. Then, the resulting death probability of the mix is calculated as:
+#'
+#' \eqn{q_x = w_x model_x + (1-w_x)close_x},
+#'
+#' where \eqn{w_x} represents the weight of the closing method in the age \eqn{x}.
+#' This computation is applied to all elements in the MCMC chain of the fitted model,
+#' resulting in a new chain of death probabilities. This procedure is applied only in
+#' the linear and Gompertz methods.
+#'
+#' The four closing methods for life tables are:
+#'
 #' 1.'hp' method: Expands the previously adjusted HP model until the max_age argument.
+#'
 #' 2.'plateau' method: Keeps the death probability (qx) constant after the x0 argument.
+#'
 #' 3.'linear' method: Fits a linear regression starting at age x0 - k until the last age with data available (lognormal only).
+#'
 #' 4.'gompertz' method: Adopted as the closing method of the 2010-2012 English Life Table No. 17, fits the Gompertz mortality law via SIR using the same available data as the 'linear' method.
 #'
 #' @return Returns a `ClosedHP` class object with the predictive chains of the death probability

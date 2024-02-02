@@ -9,7 +9,7 @@
 #'
 #' @usage
 #' hp(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"),
-#'  M = 50000, bn = round(M/2), thin = 10, m = rep(NA, 8), v = rep(NA, 8),
+#'  M = NULL, bn = NULL, thin = 10, m = rep(NA, 8), v = rep(NA, 8),
 #'  inits = NULL, K = NULL, sigma2 = NULL, prop.control = NULL,
 #'  reduced_model = FALSE)
 #'
@@ -17,9 +17,9 @@
 #' @param Ex Numeric vector with the exposure by age.
 #' @param Dx Numeric vector with the death counts by age.
 #' @param model Character string specifying the model to be adopted. The options are: "binomial", "lognormal" or "poisson".
-#' @param M Positive integer indicating the number of iterations of the MCMC run.
-#' @param bn Non-negative integer indicating the number of iteration to be discarded as the burn-in period.
-#' @param thin Positive integer specifying the period for saving samples.
+#' @param M Positive integer indicating the number of iterations of the MCMC run. The default value is 50000 iterations. For the reduced model, the default is 30000 iterations.
+#' @param bn Non-negative integer indicating the number of iteration to be discarded as the burn-in period. The default value is half of the M value, rounded.
+#' @param thin Positive integer specifying the period for saving samples. The default value is 10.
 #' @param m Numeric vector with the mean of the prior distributions for (A, B, C, D, E, F, G, H).
 #' @param v Numeric vector with the variance of the prior distributions for (A, B, C, D, E, F, G, H).
 #' @param inits Numeric vector with the initial values for the parameters (A, B, C, D, E, F, G, H).
@@ -130,7 +130,7 @@
 #' @import stats
 #'
 #' @export
-hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 50000, bn = round(M/2),
+hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = NULL, bn = NULL,
                thin = 10, m = rep(NA_real_, 8), v = rep(NA_real_, 8), inits = NULL, K = NULL, sigma2 = NULL,
                prop.control = NULL, reduced_model = FALSE){
 
@@ -144,6 +144,20 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
 
   x0 <- min(x, na.rm = T)
   if(x0 >= 15){ if(!reduced_model) warning("Lower age >= 15. We recommend to use reduced_model = TRUE.", immediate. = T) }
+
+  if(is.null(M)){
+    if(reduced_model){
+      M = 30000
+    }else{
+      M = 50000
+    }
+  }
+
+  if(is.null(bn)){
+    bn = round(M/2)
+  }
+
+  if(bn > M){ stop("The total number of iterations (M) must be greater than the burnin period (bn).") }
 
   M = as.integer(trunc(M)); bn = as.integer(trunc(bn)); thin = trunc(thin)
   if(M < 1 || bn < 0 || thin < 1){ stop("M, bn and thin must be positive numbers.") }
@@ -246,12 +260,12 @@ hp <- function(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"), M = 500
 
   ### returns
   return(structure(list(summary = round(resumo, 6),
-              post.samples = list(mcmc_theta = mcmc_theta, sigma2 = sigma2),
-              data = data,
-              info = list(model = model,
-                          reduced = reduced_model,
-                          inits = mcmc$inits,
-                          prior.dist = prior.dist,
-                          prop.control = prop.control)),
-              class = "HP"))
+                        post.samples = list(mcmc_theta = mcmc_theta, sigma2 = sigma2),
+                        data = data,
+                        info = list(model = model,
+                                    reduced = reduced_model,
+                                    inits = mcmc$inits,
+                                    prior.dist = prior.dist,
+                                    prop.control = prop.control)),
+                   class = "HP"))
 }

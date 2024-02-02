@@ -98,7 +98,7 @@ plot.BLC <- function(x, parameter = "all", prob = 0.9,
       geom_hline(yintercept = 0, col = "red", lty = 2) +
       geom_ribbon(aes(x = x, ymin = lim.inf, ymax = lim.sup), alpha = 0.5, fill = "blue") +
       geom_line(aes(x = x, y = fitted), col = "blue") +
-      xlab("x") + ylab("qx") + theme_bw() +
+      xlab("x") + ylab(expression(beta[x])) + theme_bw() +
       theme(axis.title.x = ggplot2::element_text(color = 'black', size = 13),
             axis.title.y = ggplot2::element_text(color = 'black', size = 13))
 

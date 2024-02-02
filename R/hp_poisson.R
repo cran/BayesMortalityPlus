@@ -192,17 +192,22 @@ hp_poisson <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m = NUL
 
     if(length(limite_inf) > 0){
       theta.post[k, limite_inf] <- theta.post[k-1, limite_inf]
-      param_problemas = append(param_problemas, param[limite_inf]); warn = T
+      if(k > bn){
+        param_problemas = append(param_problemas, param[limite_inf]); warn = T
+      }
     }
 
     if(length(limite_sup) > 0){
       theta.post[k, limite_sup] <- theta.post[k-1, limite_sup]
-      param_problemas = append(param_problemas, param[limite_sup]); warn = T
+      if(k > bn){
+        param_problemas = append(param_problemas, param[limite_sup]); warn = T
+      }
     }
+
 
   })
 
-  if(warn){ warning(paste0("MCMC had some problem with parameter(s): ", paste(sort(unique(param_problemas)), collapse = ", "), ". Try to assign informative prior distributions.")) }
+  if(warn){ warning(paste0("MCMC may have had some issues with the parameter(s): ", paste(sort(unique(param_problemas)), collapse = ", "), ".\nCheck the 'plot_chain' function output to visualize the parameters chain. It might be helpful to assign informative prior distribution for these parameters. See ?hp.")) }
 
   ##############################################################################################
   ### Return

@@ -5,7 +5,7 @@
 \title{Bayesian Heligman-Pollard curve for mortality table graduation}
 \usage{
 hp(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"),
- M = 50000, bn = round(M/2), thin = 10, m = rep(NA, 8), v = rep(NA, 8),
+ M = NULL, bn = NULL, thin = 10, m = rep(NA, 8), v = rep(NA, 8),
  inits = NULL, K = NULL, sigma2 = NULL, prop.control = NULL,
  reduced_model = FALSE)
 }
@@ -18,11 +18,11 @@ hp(x, Ex, Dx, model = c("binomial", "lognormal", "poisson"),
 
 \item{model}{Character string specifying the model to be adopted. The options are: "binomial", "lognormal" or "poisson".}
 
-\item{M}{Positive integer indicating the number of iterations of the MCMC run.}
+\item{M}{Positive integer indicating the number of iterations of the MCMC run. The default value is 50000 iterations. For the reduced model, the default is 30000 iterations.}
 
-\item{bn}{Non-negative integer indicating the number of iteration to be discarded as the burn-in period.}
+\item{bn}{Non-negative integer indicating the number of iteration to be discarded as the burn-in period. The default value is half of the M value, rounded.}
 
-\item{thin}{Positive integer specifying the period for saving samples.}
+\item{thin}{Positive integer specifying the period for saving samples. The default value is 10.}
 
 \item{m}{Numeric vector with the mean of the prior distributions for (A, B, C, D, E, F, G, H).}
 

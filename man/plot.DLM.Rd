@@ -50,13 +50,14 @@ Dx = USA1990$Dx.Male[x+1]
 y = log(Dx/Ex)
 
 ## Fitting DLM
-fit = dlm(y, ages = 0:100, M = 100, bn = 20, thin = 1)
+fit = dlm(y, ages = 0:100, M = 100)
 
 ## Plotting the life tables:
 plot(fit)
 
 ## Now we are starting from 20 years
-\donttest{fit2 = dlm(y[21:101], Ft = 1, Gt = 1, ages = 20:100, M = 100, bn = 20, thin = 1)
+\donttest{
+fit2 = dlm(y[21:101], Ft = 1, Gt = 1, ages = 20:100, M = 100)
 
 plot(fit2, plotIC = FALSE)
 

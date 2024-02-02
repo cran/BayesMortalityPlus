@@ -32,12 +32,10 @@ x = 0:100
 Ex = USA2000$Ex.Total[x+1]
 Dx = USA2000$Dx.Total[x+1]
 
-mx_t = Dx/Ex
-qx_t = 1 - exp(-mx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 ## Fitting dlm
-fit = dlm(y, M = 100, bn = 20, thin = 1)
+fit = dlm(y, M = 100)
 
 ## Extrapolating the death probabilities (qx)
 predict(fit, h = 3, prob = 0.95)

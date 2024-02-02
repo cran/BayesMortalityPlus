@@ -28,7 +28,7 @@
 #' Dx = USA1990$Dx.Total[1:111]
 #' y <- log(Dx/Ex)
 #'
-#' fit <- dlm(y, M = 100, bn = 20, thin = 1)
+#' fit <- dlm(y, M = 100)
 #' expectancy(fit)
 #'
 #' # Example 2: -------------------------------
@@ -64,11 +64,11 @@ expectancy.DLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
   if(max_age > max(fit$info$ages)){
     pred <- predict(fit, h = (max_age - max(fit$info$ages)), prob = prob )
     aux <- fitted(fit, prob = prob)
-    mu <- c(aux$qx_fitted, pred$qx_fitted)
-    ic <- rbind(aux[,-c(1,2)], data.frame(qi = pred$qx_inf, qs = pred$qx_sup))
+    mu <- c(aux$qx.fitted, pred$qx.fitted)
+    ic <- rbind(aux[,-c(1,2)], data.frame(qx.lower = pred$qx.lower, qx.upper = pred$qx.upper))
   }else{
     aux <- fitted(fit, prob = prob)
-    mu <- aux$qx_fitted
+    mu <- aux$qx.fitted
     ic <- aux[,-2]
   }
 
@@ -78,8 +78,8 @@ expectancy.DLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
   # cumprod for life expectancy (px)
   for (i in 1:max_age){
     exp_total[i] <- sum(cumprod(1-mu[i:max_age])) ## px
-    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age])) ## upper CI
-    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age])) ## lower CI
+    exp_sup[i] <- sum(cumprod(1-ic$qx.lower[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-ic$qx.upper[i:max_age])) ## lower CI
   }
   exp_total <- round(exp_total,2)
   exp_sup <- round(exp_sup,2)
@@ -90,16 +90,16 @@ expectancy.DLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
                     exp_inf[1:(max(age)+1)],
                     exp_sup[1:(max(age)+1)])
   tab[is.na(tab)] = 0
-  colnames(tab) <- c("Age","Expectancy","Lower CI","Upper CI")
+  colnames(tab) <- c("age","expectancy","ci.lower","ci.upper")
 
   if(graph == TRUE){
     p <-  ggplot(data=tab) + theme_light() +
-      geom_line(aes(x=Age,y=Expectancy)) +
-      geom_ribbon(aes(x=Age, ymin=`Lower CI`, ymax=`Upper CI`), alpha=0.3)
-    return(list(tabua=tab[tab$Age %in% age,],
+      geom_line(aes(x=age,y=expectancy)) +
+      geom_ribbon(aes(x=age, ymin= ci.lower, ymax= ci.upper), alpha=0.3)
+    return(list(expectancy=tab[tab$age %in% age,],
                 plot=p))
   }else{
-    return(tab[tab$Age %in% age,])
+    return(tab[tab$age %in% age,])
   }
 }
 
@@ -119,7 +119,7 @@ expectancy.ClosedDLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
 
   ## calculating log(qx)
   aux <- fitted(fit, prob = prob)
-  mu <- aux$qx_fitted
+  mu <- aux$qx.fitted
   ic <- aux[,-2]
 
 
@@ -128,8 +128,8 @@ expectancy.ClosedDLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
   # cumprod for life expectancy (px)
   for (i in 1:max_age){
     exp_total[i] <- sum(cumprod(1-mu[i:max_age])) ## px
-    exp_sup[i] <- sum(cumprod(1-ic$qi[i:max_age])) ## upper CI
-    exp_inf[i] <- sum(cumprod(1-ic$qs[i:max_age])) ## lower CI
+    exp_sup[i] <- sum(cumprod(1-ic$qx.lower[i:max_age])) ## upper CI
+    exp_inf[i] <- sum(cumprod(1-ic$qx.upper[i:max_age])) ## lower CI
   }
   exp_total <- round(exp_total,2)
   exp_sup <- round(exp_sup,2)
@@ -141,15 +141,15 @@ expectancy.ClosedDLM <- function(x, age = seq(0, max(fit$info$ages), by = 10),
                     exp_inf[1:(max(age)+1)],
                     exp_sup[1:(max(age)+1)])
   tab[is.na(tab)] = 0
-  colnames(tab) <- c("Age","Expectancy","Lower CI","Upper CI")
+  colnames(tab) <- c("age","expectancy","ci.lower","ci.upper")
 
   if(graph == TRUE){
     p <-  ggplot(data=tab) + theme_light() +
-      geom_line(aes(x=Age,y=Expectancy)) +
-      geom_ribbon(aes(x=Age, ymin=`Lower CI`, ymax=`Upper CI`), alpha=0.3)
-    return(list(expectancy=tab[tab$Age %in% age,],
+      geom_line(aes(x=age,y=expectancy)) +
+      geom_ribbon(aes(x=age, ymin= ci.lower, ymax= ci.upper), alpha=0.3)
+    return(list(expectancy=tab[tab$age %in% age,],
                 plot=p))
   }else{
-    return(tab[tab$Age %in% age,])
+    return(tab[tab$age %in% age,])
   }
 }

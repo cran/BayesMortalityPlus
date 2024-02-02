@@ -31,7 +31,7 @@ Dx = USA2010$Dx.Male[x+1]
 y = log(Dx/Ex)
 
 ## Fitting DLM
-fit = dlm(y, M = 100, bn = 20, thin = 1)
+fit = dlm(y, M = 100)
 summary(fit)
 
 }

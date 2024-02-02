@@ -44,7 +44,7 @@ Ex = USA1990$Ex.Total[1:111]
 Dx = USA1990$Dx.Total[1:111]
 y <- log(Dx/Ex)
 
-fit <- dlm(y, M = 100, bn = 20, thin = 1)
+fit <- dlm(y, M = 100)
 expectancy(fit)
 
 # Example 2: -------------------------------

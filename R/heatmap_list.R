@@ -97,10 +97,10 @@ Heatmap.list <- function(x, x_lab = NULL, age = NULL, max_age = NULL,
      for(i in 1:length(lista_exp)){exps <- rbind(exps,lista_exp[[i]])}
    }
    #creating heatmap dataframe
-   exp <- exps$Expectancy
+   exp <- exps$expectancy
    ano <- c()
    for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
-   idade <- exps$Age
+   idade <- exps$age
    df <- data.frame(
      "age" = idade,
      "year" = rev(as.character(ano)),
@@ -109,7 +109,7 @@ Heatmap.list <- function(x, x_lab = NULL, age = NULL, max_age = NULL,
    #plot
    midp <- mean(exp)
    p <- ggplot(df) + theme_light() +
-     geom_raster(aes(x = year, y = age, fill = exp),interpolate = TRUE) +
+     geom_raster(aes(x = year, y = age, fill = exp),interpolate = FALSE) +
      labs(x="",
           y="Age",
           title = "Life expectancy") +

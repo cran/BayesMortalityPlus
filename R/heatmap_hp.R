@@ -53,10 +53,10 @@ Heatmap.HP <- function(x, x_lab = NULL, age = 0:90, max_age = 110,
 
 
   #creating dataframe for the heatmap:
-  exp <- exps$Expectancy
+  exp <- exps$expectancy
   ano <- c()
   for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
-  idade <- exps$Age
+  idade <- exps$age
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),
@@ -66,7 +66,7 @@ Heatmap.HP <- function(x, x_lab = NULL, age = 0:90, max_age = 110,
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +
-    geom_raster(aes(x = year, y = age, fill = exp),interpolate = TRUE) +
+    geom_raster(aes(x = year, y = age, fill = exp), interpolate = FALSE) +
     labs(x="",
          y="Age",
          title = "Life expectancy") +
@@ -94,10 +94,10 @@ Heatmap.ClosedHP <- function(x, x_lab = NULL, age = 0:90,
   exps <- expectancy(fits, graph = FALSE, age = age)
 
   #creating dataframe for the heatmap:
-  exp <- exps$Expectancy
+  exp <- exps$expectancy
   ano <- c()
   for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
-  idade <- exps$Age
+  idade <- exps$age
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),
@@ -107,7 +107,7 @@ Heatmap.ClosedHP <- function(x, x_lab = NULL, age = 0:90,
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +
-    geom_raster(aes(x = year, y = age, fill = exp),interpolate = TRUE) +
+    geom_raster(aes(x = year, y = age, fill = exp),interpolate = FALSE) +
     labs(x="",
          y="Age",
          title = "Life expectancy") +

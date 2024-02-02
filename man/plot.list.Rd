@@ -54,15 +54,13 @@ USA1990 = USA[USA$Year == 1990,]
 x = 0:90
 Ex = USA1990$Ex.Male[x+1]
 Dx = USA1990$Dx.Male[x+1]
-qx_t = Dx/Ex
-qx_t = 1 - exp(-qx_t)
-y = log(qx_t)
+y = log(Dx/Ex)
 
 
 ## Fit poisson and lognormal HP model and DLM
 fit = hp(x = x, Ex = Ex, Dx = Dx, model = "poisson",
          M = 2000, bn = 1000, thin = 1)
-fit2 = dlm(y, M = 100, bn = 0, thin = 1)
+fit2 = dlm(y, M = 100)
 
 ## Plot multiples life tables
 plot(list(fit, fit2),

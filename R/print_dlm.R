@@ -23,7 +23,7 @@
 #' y = log(Dx/Ex)
 #'
 #' ## Fitting DLM
-#' fit = dlm(y, M = 100, bn = 20, thin = 1)
+#' fit = dlm(y, M = 100)
 #' print(fit)
 #'
 #' @seealso [print.HP()] and [print.BLC()] for `HP` or `BLC` methods.
@@ -42,7 +42,7 @@ print.DLM <- function(x, ...){
   catf("Gt:")
   for(i in 1:nrow(fit$info$Gt)) {cat(fit$info$Gt[i,]); catf("")}
   catf("")
-  catf("Discount factor: %s", as.character(fit$info$delta))
+  cat("Discount factor: ", as.character(fit$info$delta), "\n")
   catf("")
   catf("Ages fitted:")
   cat(fit$info$ages)

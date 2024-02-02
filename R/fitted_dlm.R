@@ -26,7 +26,7 @@
 #' y = log(Dx/Ex)
 #'
 #' ## Fitting dlm
-#' fit = dlm(y, M = 100, bn = 20, thin = 1)
+#' fit = dlm(y, M = 100)
 #'
 #' ## Estimating the death probabilities (qx)
 #' fitted(fit)
@@ -36,7 +36,9 @@
 #' @export
 fitted.DLM <- function(object, age = NULL, prob = 0.95, ...){
 
+  set.seed(123) ## Set seed to reproducibility
   fit = object
+  V = 0.01 ## same value specified in filtering
 
   qx_fitted = 1 - exp(-exp(fit$mu))
   qx_fitted = apply(qx_fitted, 2, median, na.rm = T)
@@ -51,16 +53,16 @@ fitted.DLM <- function(object, age = NULL, prob = 0.95, ...){
   #   fitted[i,] <- exp(sim)
   # }
   for(i in 1:t){
-    sim = rnorm(n, fit$mu[,i], sqrt(fit$sig2))
+    sim = rnorm(n, fit$mu[,i], sqrt(fit$sig2)*V)
     fitted[,i] <- 1 - exp(-exp(sim))
   }
 
   qi = apply(fitted, 2, quantile, (1-prob)/2, na.rm = T)
   qs = apply(fitted, 2, quantile, (1+prob)/2, na.rm = T)
 
-  aux = data.frame(age = fit$info$ages, qx_fitted = qx_fitted, qi = qi, qs = qs)
-  aux[!(aux$qi > 0), 3] = 0
-  aux[!(aux$qs < 1), 4] = 1
+  aux = data.frame(age = fit$info$ages, qx.fitted = qx_fitted, qx.lower = qi, qx.upper = qs)
+  aux[!(aux$qx.lower > 0), 3] = 0
+  aux[!(aux$qx.upper < 1), 4] = 1
 
   if(!is.null(age)) aux = aux[(aux$age %in% age), ]
 
@@ -82,9 +84,9 @@ fitted.ClosedDLM <- function(object, age = NULL, prob = 0.95, ...){
   qi = apply(fitted, 2, quantile, (1-prob)/2, na.rm = T)
   qs = apply(fitted, 2, quantile, (1+prob)/2, na.rm = T)
 
-  df = data.frame(age = close_age, qx_fitted = qx_fitted, qi = qi, qs = qs)
-  df[!(df$qi > 0), 3] = 0
-  df[!(df$qs < 1), 4] = 1
+  df = data.frame(age = close_age, qx.fitted = qx_fitted, qx.lower = qi, qx.upper = qs)
+  df[!(df$qx.lower > 0), 3] = 0
+  df[!(df$qx.upper < 1), 4] = 1
 
   if(!is.null(age)) df = df[(df$age %in% age), ]
   return(df[order(df$age), ])

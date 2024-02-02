@@ -4,15 +4,16 @@
 #' variances for each age.
 #'
 #' @usage
-#' blc(Y, prior = NULL, init = NULL, M = 2000, bn = 1000)
+#' blc(Y, prior = NULL, init = NULL, M = 5000, bn = 4000, thin = 1)
 #'
 #' @param Y Log-mortality rates for each age.
 #' @param prior A list containing the prior mean \eqn{m_0} and the prior
 #' variance \eqn{C_0}.
 #' @param init A list containing initial values for \eqn{\alpha}, \eqn{\beta},
 #' \eqn{\phi_V}, \eqn{\phi_W} and \eqn{\theta}.
-#' @param M The number of iterations.
-#' @param bn The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). Default considers half the number of iterations.
+#' @param M The number of iterations. The default value is 5000.
+#' @param bn The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). The default value is 4000.
+#' @param thin A Positive integer specifying the period for saving samples. The default value is 1.
 #'
 #' @details
 #' Let \eqn{Y_{it}} be the log mortality rate at age \eqn{i} and time \eqn{t}. The Lee-Carter
@@ -103,7 +104,7 @@
 #'
 #'
 #' @export
-blc <- function(Y, prior = NULL, init = NULL, M = 2000, bn = 1000) {
+blc <- function(Y, prior = NULL, init = NULL, M = 5000, bn = 4000, thin = 1) {
 	# -------- Type validation --------
 
 	if (mode(Y) != "numeric")
@@ -252,10 +253,12 @@ blc <- function(Y, prior = NULL, init = NULL, M = 2000, bn = 1000) {
 
 	chain$kappa[,1] <- chain$kappa[,2]
 
+	chain = lapply(chain, function(x){if(length(dim(x)) > 1){x[,seq(bn+1, M, by = thin)]}else{x[seq(bn+1, M, by = thin)]}})
+
 	class(chain) <- "BLC"
 	chain$Y <- Y
-	chain$bn <- if (is.null(bn)) ceiling(M/2) else bn
-	chain$M <- M
+	chain$bn <- 0
+	chain$M <- length(chain$theta) ## Final sample size
 	chain$m0 <- prior$m0
 	chain$C0 <- prior$C0
 

@@ -44,7 +44,7 @@ ExF = USA2010$Ex.Female[1:91]
 DxF = USA2010$Dx.Female[1:91]
 yF = log(DxF/ExF)
 
-fitF <- dlm(yF, M = 100, bn = 20, thin = 1)
+fitF <- dlm(yF, M = 100)
 
 Heatmap(fitF, x_lab = "Female expec. 2010 USA", max_age = 90)
 

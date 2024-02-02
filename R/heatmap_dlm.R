@@ -27,7 +27,7 @@
 #' DxF = USA2010$Dx.Female[1:91]
 #' yF = log(DxF/ExF)
 #'
-#' fitF <- dlm(yF, M = 100, bn = 20, thin = 1)
+#' fitF <- dlm(yF, M = 100)
 #'
 #' Heatmap(fitF, x_lab = "Female expec. 2010 USA", max_age = 90)
 #'
@@ -56,10 +56,10 @@ Heatmap.DLM <- function(x, x_lab = NULL, age = NULL, max_age = 110,
   exps <- expectancy(fits, graph = FALSE, age = age, max_age = max_age)
 
   #creating dataframe for the heatmap:
-  exp <- exps$Expectancy
+  exp <- exps$expectancy
   ano <- c()
   for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
-  idade <- exps$Age
+  idade <- exps$age
   df <- data.frame(
     "age" = idade,
     "year" = rev(as.character(ano)),
@@ -69,7 +69,7 @@ Heatmap.DLM <- function(x, x_lab = NULL, age = NULL, max_age = 110,
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +
-    geom_raster(aes(x = year, y = age, fill = exp),interpolate = TRUE) +
+    geom_raster(aes(x = year, y = age, fill = exp),interpolate = FALSE) +
     labs(x="",
          y="Age",
          title = "Life expectancy") +
@@ -98,8 +98,8 @@ Heatmap.ClosedDLM <- function(x, x_lab = NULL, age = NULL,
   exps <- expectancy(fits, graph = FALSE, age = age)
 
   #creating dataframe for the heatmap:
-  exp <- exps$Expectancy
-  idade <- exps$Age
+  exp <- exps$expectancy
+  idade <- exps$age
   ano <- c()
   for(i in 1:length(x_lab)){ano <- c((rep(x_lab[i],length(age))),ano)}
   df <- data.frame(
@@ -111,7 +111,7 @@ Heatmap.ClosedDLM <- function(x, x_lab = NULL, age = NULL,
   midp <- mean(exp)
 
   p <- ggplot(df) + theme_light() +
-    geom_raster(aes(x = year, y = age, fill = exp),interpolate = TRUE) +
+    geom_raster(aes(x = year, y = age, fill = exp),interpolate = FALSE) +
     labs(x="",
          y="Age",
          title = "Life expectancy") +

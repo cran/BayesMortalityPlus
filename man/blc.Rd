@@ -4,7 +4,7 @@
 \alias{blc}
 \title{Lee-Carter Bayesian Estimation for mortality data}
 \usage{
-blc(Y, prior = NULL, init = NULL, M = 2000, bn = 1000)
+blc(Y, prior = NULL, init = NULL, M = 5000, bn = 4000, thin = 1)
 }
 \arguments{
 \item{Y}{Log-mortality rates for each age.}
@@ -15,9 +15,11 @@ variance \eqn{C_0}.}
 \item{init}{A list containing initial values for \eqn{\alpha}, \eqn{\beta},
 \eqn{\phi_V}, \eqn{\phi_W} and \eqn{\theta}.}
 
-\item{M}{The number of iterations.}
+\item{M}{The number of iterations. The default value is 5000.}
 
-\item{bn}{The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). Default considers half the number of iterations.}
+\item{bn}{The number of initial iterations from the Gibbs sampler that should be discarded (burn-in). The default value is 4000.}
+
+\item{thin}{A Positive integer specifying the period for saving samples. The default value is 1.}
 }
 \value{
 A \code{BLC} object.

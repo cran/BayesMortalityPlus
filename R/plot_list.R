@@ -30,15 +30,13 @@
 #' x = 0:90
 #' Ex = USA1990$Ex.Male[x+1]
 #' Dx = USA1990$Dx.Male[x+1]
-#' qx_t = Dx/Ex
-#' qx_t = 1 - exp(-qx_t)
-#' y = log(qx_t)
+#' y = log(Dx/Ex)
 #'
 #'
 #' ## Fit poisson and lognormal HP model and DLM
 #' fit = hp(x = x, Ex = Ex, Dx = Dx, model = "poisson",
 #'          M = 2000, bn = 1000, thin = 1)
-#' fit2 = dlm(y, M = 100, bn = 0, thin = 1)
+#' fit2 = dlm(y, M = 100)
 #'
 #' ## Plot multiples life tables
 #' plot(list(fit, fit2),
@@ -83,7 +81,7 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
         if(classes[i] %in% c("HP", "ClosedHP")){
           age[[i]] = fits[[i]]$data$x; data_aux[[i]] = fits[[i]]$data
         }else{
-          age[[i]] = fits[[i]]$info$ages; data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = exp(fits[[i]]$info$y))
+          age[[i]] = fits[[i]]$info$ages; data_aux[[i]] = data.frame(x = fits[[i]]$info$ages, qx = 1 - exp(-exp(fits[[i]]$info$y)))
         }
       }
     }else{
@@ -136,16 +134,16 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
       if(h[i] > 0) {
         qx_pred <- predict(fits[[i]], h = h[i])
         aux_last_age = max(aux$age)
-        aux_qx_fit = c(aux$qx_fitted, qx_pred$qx_fitted)
-        aux_qi_fit = c(aux$qi, qx_pred$qx_inf)
-        aux_qs_fit = c(aux$qs, qx_pred$qx_sup)
+        aux_qx_fit = c(aux$qx.fitted, qx_pred$qx.fitted)
+        aux_qi_fit = c(aux$qx.lower, qx_pred$qx.lower)
+        aux_qs_fit = c(aux$qx.upper, qx_pred$qx.upper)
         aux1 = data.frame(age = c(aux$age, (aux_last_age+1):(aux_last_age+h[i])),
-                          qx_fitted = aux_qx_fit)
+                          qx.fitted = aux_qx_fit)
         aux2 = data.frame(age = c(aux$age, (aux_last_age+1):(aux_last_age+h[i])),
-                          qi = aux_qi_fit, qs = aux_qs_fit)
+                          qx.lower = aux_qi_fit, qx.upper = aux_qs_fit)
       }else{
-        aux1 = data.frame(age = aux$age, qx_fitted = aux$qx_fitted)
-        aux2 = data.frame(age = aux$age, qi = aux$qi, qs = aux$qs)
+        aux1 = data.frame(age = aux$age, qx.fitted = aux$qx.fitted)
+        aux2 = data.frame(age = aux$age, qx.lower = aux$qx.lower, qx.upper = aux$qx.upper)
       }
       qx_fit <- rbind(qx_fit, aux1)
       qx_cin <- rbind(qx_cin, aux2)
@@ -214,7 +212,7 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
       }
     }
     ## lower limit:
-    limits_y <- decimal(min(c(qx_cin$qi[qx_cin$qi > 0], data$qx[data$qx > 0], qx_fit$qx_fitted[qx_fit$qx_fitted > 0]), na.rm = T))
+    limits_y <- decimal(min(c(qx_cin$qx.lower[qx_cin$qx.lower > 0], data$qx[data$qx > 0], qx_fit$qx.fitted[qx_fit$qx.fitted > 0]), na.rm = T))
 
     ## Plot base:
     g <- ggplot2::ggplot() +
@@ -232,16 +230,16 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
     if(plotIC){
       if(plotData){
         g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = Model), alpha = 0.8, size = 0.8) +
-          ggplot2::geom_ribbon(data = qx_cin, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = Model), alpha = 0.3) +
-          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
+          ggplot2::geom_ribbon(data = qx_cin, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = Model), alpha = 0.3) +
+          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
           ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
           ggplot2::scale_fill_manual(name = NULL, values = colors) +
           ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
           ggplot2::guides(fill = "none")
       }else{
         g +
-          ggplot2::geom_ribbon(data = qx_cin, ggplot2::aes(x = age, ymin = qi, ymax = qs, fill = Model), alpha = 0.3) +
-          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
+          ggplot2::geom_ribbon(data = qx_cin, ggplot2::aes(x = age, ymin = qx.lower, ymax = qx.upper, fill = Model), alpha = 0.3) +
+          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
           ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
           ggplot2::scale_fill_manual(name = NULL, values = colors) +
           ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
@@ -250,13 +248,13 @@ plot.list <- function(x, age = NULL, Ex = NULL, plotIC = TRUE,
     }else{
       if(plotData){
         g + ggplot2::geom_point(data = data, ggplot2::aes(x = x, y = qx, col = Model), alpha = 0.8, size = 0.8) +
-          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
+          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
           ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
           ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
           ggplot2::guides(fill = "none")
       }else{
         g +
-          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx_fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
+          ggplot2::geom_line(data = qx_fit, ggplot2::aes(x = age, y = qx.fitted, col = Model, lty = Model), linewidth = 0.8, alpha = 0.8) +
           ggplot2::scale_colour_manual(name = NULL, values = new_colors, labels = new_labels) +
           ggplot2::scale_linetype_manual(name = NULL, values = linetype, labels = new_labels) +
           ggplot2::guides(fill = "none")

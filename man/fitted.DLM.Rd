@@ -34,7 +34,7 @@ Dx = USA2000$Dx.Total[x+1]
 y = log(Dx/Ex)
 
 ## Fitting dlm
-fit = dlm(y, M = 100, bn = 20, thin = 1)
+fit = dlm(y, M = 100)
 
 ## Estimating the death probabilities (qx)
 fitted(fit)

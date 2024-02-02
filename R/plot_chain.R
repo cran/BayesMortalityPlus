@@ -36,7 +36,7 @@
 #'
 #'
 #' ## Fitting DLM
-#' fit = dlm(y, M = 100, bn = 20, thin = 1)
+#' fit = dlm(y, M = 100)
 #'
 #' plot_chain(fit, param = "sigma2", type = "trace")
 #' plot_chain(fit, param = "mu[10]", type = "acf")
