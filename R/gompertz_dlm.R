@@ -4,13 +4,13 @@ sir_gompertz_dlm <- function(fit, data, resampling_size = nrow(fit$mu)){
 
   ## Gompertz: gomp = a*exp(b*x)
 
-    y = data$y
-    sigma = sqrt(median(fit$sig2))
+  y = data$y  ## log(qx)
+  sigma = median(sqrt(0.01*fit$sig2))
 
-    likelihood <- function(par){
-      gomp = par[1]*exp(par[2]*data$x)     #### normality in DLM
-      prod(dnorm(y, mean = log(gomp), sd = sigma))
-    }
+  likelihood <- function(par){
+    gomp = par[1]*exp(par[2]*data$x)     #### normality in DLM
+    prod(dnorm(y, mean = log(gomp), sd = sigma))
+  }
 
   ### SIR method
 

@@ -40,9 +40,9 @@ fitted.DLM <- function(object, age = NULL, prob = 0.95, ...){
   fit = object
   V = 0.01 ## same value specified in filtering
 
-  qx_fitted = 1 - exp(-exp(fit$mu))
-  qx_fitted = apply(qx_fitted, 2, median, na.rm = T)
-  qx_fitted[(qx_fitted < 0 | qx_fitted > 1)] = NA_real_
+  # qx_fitted = 1 - exp(-exp(fit$mu))
+  # qx_fitted = apply(qx_fitted, 2, median, na.rm = T)
+  # qx_fitted[(qx_fitted < 0 | qx_fitted > 1)] = NA_real_
 
   t = ncol(fit$mu)
   n = nrow(fit$mu)
@@ -57,6 +57,9 @@ fitted.DLM <- function(object, age = NULL, prob = 0.95, ...){
     fitted[,i] <- 1 - exp(-exp(sim))
   }
 
+  qx_fitted = apply(fitted, 2, median, na.rm = T)
+  qx_fitted[qx_fitted < 0] = NA_real_
+  qx_fitted[qx_fitted > 1] = 1
   qi = apply(fitted, 2, quantile, (1-prob)/2, na.rm = T)
   qs = apply(fitted, 2, quantile, (1+prob)/2, na.rm = T)
 

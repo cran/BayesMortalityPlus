@@ -201,17 +201,18 @@ hp_lognormal_red <- function(x, Ex, Dx, M = 100000, bn = round(M/4), thin = 1, m
     limite_inf = which(theta.post[k,4:8] <= c(1e-16, 1e-16, 15+1e-16, 1e-16, 1e-16))
     limite_sup = which(theta.post[k,4:8] >= c(1-1e-5, Inf, 110-1e-5, 1-1e-5, Inf))
 
+
     if(length(limite_inf) > 0){
-      theta.post[k, limite_inf] <- theta.post[k-1, limite_inf]
+      theta.post[k, 3 + limite_inf] <- theta.post[k-1, 3 + limite_inf]
       if(k > bn){
-        param_problemas = append(param_problemas, param[limite_inf]); warn = T
+        param_problemas = append(param_problemas, param[3 + limite_inf]); warn = T
       }
     }
 
     if(length(limite_sup) > 0){
-      theta.post[k, limite_sup] <- theta.post[k-1, limite_sup]
+      theta.post[k, 3 + limite_sup] <- theta.post[k-1, 3 + limite_sup]
       if(k > bn){
-        param_problemas = append(param_problemas, param[limite_sup]); warn = T
+        param_problemas = append(param_problemas, param[3 + limite_sup]); warn = T
       }
     }
 

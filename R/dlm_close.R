@@ -180,7 +180,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
   if(method == "plateau"){
 
     #gets the death probability of x0 and applies it till max_age
-    sim <- 1 - exp(-exp(rnorm(num_sim, fit$mu[,x0-min_age+1], 0.01*fit$sig2)))
+    sim <- 1 - exp(-exp(rnorm(num_sim, fit$mu[,x0-min_age+1], sqrt(0.01*fit$sig2))))
     closed <- matrix(sim, num_sim, old_len)
     colnames(closed) = old_x
 
@@ -201,7 +201,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
     RMAT = (diag(old_len) + Cpred)
 
     for (i in 1:num_sim){
-      sig = 0.01*fit$sig2[i]
+      sig = sqrt(0.01*fit$sig2[i])
       SIGMApred = sig * RMAT
 
       sim_vals = MASS::mvrnorm(1, mu = pred, Sigma = SIGMApred)
@@ -215,7 +215,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
 
     for (i in 1:num_sim){
       gomp = param[i,1]*exp(param[i,2]*old_x)
-      sim = 1 - exp(-exp(rnorm(old_len, log(gomp), 0.01*fit$sig2[i])))
+      sim = 1 - exp(-exp(rnorm(old_len, log(gomp), sqrt(0.01*fit$sig2[i]))))
       closed[i, ] = sim
     }
   }
@@ -233,7 +233,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
   ####################################################################################################
   t = ncol(fit$mu)
   for (i in 1:num_sim){
-    sim = rnorm(t, fit$mu[i,], 0.01*fit$sig2[i])
+    sim = rnorm(t, fit$mu[i,], sqrt(0.01*fit$sig2[i]))
     fitted[i, (min_age+1):(t+min_age)] = 1 - exp(-exp(sim))
   }
   ####################################################################################################
