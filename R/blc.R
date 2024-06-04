@@ -211,7 +211,7 @@ blc <- function(Y, prior = NULL, init = NULL, M = 5000, bn = 4000, thin = 1) {
 
 	  pb$tick() ## Progress Bar
 
-		kdf <- kd.filter(Y, prior$m0, prior$C0,diag(1/chain$phiv[ ,i-1]),
+		kdf <- kd.filter(Y, prior$m0, prior$C0, diag(1/chain$phiv[ ,i-1]),
 						 1/chain$phiw[i-1], chain$beta[ ,i-1], 1,
 						 chain$alpha[ ,i-1], chain$theta[i-1])
 		kds <- kd.smoother(Y, kdf, 1/chain$phiw[i-1], 1, chain$theta[i-1])

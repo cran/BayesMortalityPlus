@@ -109,10 +109,15 @@ Heatmap.list <- function(x, x_lab = NULL, age = NULL, max_age = NULL,
    #plot
    midp <- mean(exp)
    p <- ggplot(df) + theme_light() +
-     geom_raster(aes(x = year, y = age, fill = exp),interpolate = FALSE) +
+     ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
+                    axis.title.x = ggplot2::element_text(color = 'black', size = 12),
+                    axis.title.y = ggplot2::element_text(color = 'black', size = 12),
+                    axis.text = ggplot2::element_text(color = 'black', size = 12),
+                    legend.text = ggplot2::element_text(size = 12),
+                    legend.position = "bottom") +
+     geom_raster(aes(x = year, y = age, fill = exp), interpolate = FALSE) +
      labs(x="",
-          y="Age",
-          title = "Life expectancy") +
+          y="Age") +
      scale_fill_gradient2(name = "Expectancy (years)",
                           low = color[1],
                           mid = color[2],

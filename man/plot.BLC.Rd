@@ -4,7 +4,7 @@
 \alias{plot.BLC}
 \title{BLC: Plot the fitted values}
 \usage{
-\method{plot}{BLC}(x, parameter = "all", prob = 0.9, age = NULL, ...)
+\method{plot}{BLC}(x, parameter = "all", prob = 0.9, age = NULL, year = NULL, ...)
 }
 \arguments{
 \item{x}{A \code{BLC} object, result of a call to blc() function.}
@@ -14,6 +14,8 @@
 \item{prob}{A numeric value that indicates the probability for the credible interval. Default is '0.9'.}
 
 \item{age}{A numeric vector that represents the ages used in the fitted BLC model. Default is 'NULL'.}
+
+\item{year}{A numeric vector that represents the years used in the fitted BLC model. Default is 'NULL'.}
 
 \item{...}{Other arguments.}
 }

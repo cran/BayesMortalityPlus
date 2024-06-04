@@ -118,7 +118,7 @@ dlm <- function(y, Ft = matrix(c(1,0), nrow = 1), Gt = matrix(c(1,0,1,1), 2), de
   if(nrow(prior$C) != nrow(Gt)) stop("Dimension of prior covariance matrix does not match the dimension of matrix Gt.")
   if(ncol(prior$C) != nrow(Gt)) stop("Dimension of prior covariance matrix does not match the dimension of matrix Gt.")
   if(!(length(delta) == length(y)) & length(delta) != 1) stop("delta must be the same length of y")
-  if(any(delta <= 0 | delta >= 1)) stop("delta must be in the interval (0,1).")
+  if(any(delta <= 0 | delta > 1)) stop("delta must be in the interval (0,1].")
 
   ## Auxiliary objects
   t = length(y)

@@ -10,6 +10,7 @@
 #' @param parameter A character determines the parameter that will be plotted. Default is "all" which means that all three parameters "alpha", "beta" and "kappa" will be plotted. It can also be "alpha", "beta", "kappa" or "fitted". The last one provides a plot with all the fitted tables.
 #' @param prob A numeric value that indicates the probability for the credible interval. Default is '0.9'.
 #' @param age A numeric vector that represents the ages used in the fitted BLC model. Default is 'NULL'.
+#' @param year A numeric vector that represents the years used in the fitted BLC model. Default is 'NULL'.
 #' @param ... Other arguments.
 #'
 #' @return A plot with the fitted log mortality or fitted values and credible intervals of the parameters.
@@ -39,7 +40,7 @@
 #'
 #' @export
 plot.BLC <- function(x, parameter = "all", prob = 0.9,
-                     age = NULL, ...) {
+                     age = NULL, year = NULL, ...) {
   obj = x
   sig = 1 - prob
   if(!(is.null(age))){
@@ -73,12 +74,20 @@ plot.BLC <- function(x, parameter = "all", prob = 0.9,
 
   N <- length(kappa.est)
 
+  if(!(is.null(year))){
+    if(!(is.integer(year))){
+      stop("Object year should be an integer vector")
+    }
+  }else{
+    year = 1:N
+  }
+
   # Plot types
   if(parameter == "all"){
 
     df.beta = data.frame(x = age, fitted = beta.est, lim.inf = beta.inf, lim.sup = beta.sup, param = "beta")
     df.alpha = data.frame(x = age, fitted = alpha.est, lim.inf = alpha.inf, lim.sup = alpha.sup, param = "alpha")
-    df.kappa = data.frame(x = 1:N, fitted = kappa.est, lim.inf = kappa.inf, lim.sup = kappa.sup, param = "kappa")
+    df.kappa = data.frame(x = year, fitted = kappa.est, lim.inf = kappa.inf, lim.sup = kappa.sup, param = "kappa")
     df = rbind(df.beta, df.alpha, df.kappa)
     df$param = factor(df$param, labels = c("alpha[x]", "beta[x]", "kappa[t]"))
 
@@ -88,8 +97,9 @@ plot.BLC <- function(x, parameter = "all", prob = 0.9,
       xlab("") + ylab("") + theme_bw() +
       theme(axis.title.x = ggplot2::element_text(color = 'black', size = 13),
             axis.title.y = ggplot2::element_text(color = 'black', size = 13)) +
-      facet_wrap(~param, scales = "free", nrow = 2,
-                 labeller = label_parsed) +
+      facet_wrap(~factor(param, levels = c("alpha[x]", "kappa[t]", "beta[x]")),
+                 scales = "free", nrow = 2, labeller = label_parsed) +
+      scale_x_continuous(breaks = scales::pretty_breaks()) +
       geom_hline(data = data.frame(yint = 0, param = "beta[x]"), aes(yintercept = yint), col = "red", lty = 2)
 
   }else if(parameter == "beta"){
@@ -114,10 +124,11 @@ plot.BLC <- function(x, parameter = "all", prob = 0.9,
   }else if(parameter == "kappa"){
 
     N = length(kappa.est)
-    ggplot(data = data.frame(x = 1:N, fitted = kappa.est, lim.inf = kappa.inf, lim.sup = kappa.sup)) +
+    ggplot(data = data.frame(x = year, fitted = kappa.est, lim.inf = kappa.inf, lim.sup = kappa.sup)) +
       geom_ribbon(aes(x = x, ymin = lim.inf, ymax = lim.sup), alpha = 0.5, fill = "blue") +
       geom_line(aes(x = x, y = fitted), col = "blue") +
       xlab("t") + ylab(expression(kappa[t])) + theme_bw() +
+      scale_x_continuous(breaks = scales::pretty_breaks()) +
       theme(axis.title.x = ggplot2::element_text(color = 'black', size = 13),
             axis.title.y = ggplot2::element_text(color = 'black', size = 13))
 
@@ -135,7 +146,7 @@ plot.BLC <- function(x, parameter = "all", prob = 0.9,
       scale_y_continuous(trans = "log10", breaks = 10^-seq(0,5), limits = 10^-c(5,0), labels = scales::comma) +
       scale_x_continuous(breaks = seq(0, 100, by = 10), limits = c(NA,NA)) +
       geom_line(aes(x = Age, y = exp(log.qx), col = Year), show.legend = FALSE) +
-      xlab("x") + ylab("qx") + theme_bw() +
+      xlab("Age") + ylab("qx") + theme_bw() +
       theme(axis.title.x = ggplot2::element_text(color = 'black', size = 13),
             axis.title.y = ggplot2::element_text(color = 'black', size = 13))
 

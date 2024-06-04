@@ -57,10 +57,15 @@ Heatmap.BLC <- function(x, x_lab = NULL, age = NULL, color = c("red","white","bl
   midp <- mean(exps)
 
   p <- ggplot(exps2) + theme_light() +
+    ggplot2::theme(plot.title = ggplot2::element_text(lineheight = 1.2),
+                   axis.title.x = ggplot2::element_text(color = 'black', size = 12),
+                   axis.title.y = ggplot2::element_text(color = 'black', size = 12),
+                   axis.text = ggplot2::element_text(color = 'black', size = 12),
+                   legend.text = ggplot2::element_text(size = 12),
+                   legend.position = "bottom") +
   		geom_tile(aes(x = reorder(as.character(Year), sort(as.numeric(Year))), y = Age, fill=Exp)) +
   		labs(x="Years",
-  		      y="Age",
-  		      title = "Life expectancy") +
+  		      y="Age") +
   	  scale_fill_gradient2(name = "Expectancy (years)",
   	                       low = color[1],
   	                       mid = color[2],

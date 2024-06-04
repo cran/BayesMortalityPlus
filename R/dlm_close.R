@@ -126,7 +126,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
 
   if(method == "plateau") { k = 1; weights = 0; new_data = NULL }
 
-  if((method == "gompertz" | method == "linear") & is.null(new_data)) { stop("gompertz and linear closing methods require new_data argument.") }
+  #if((method == "gompertz" | method == "linear") & is.null(new_data)) { stop("gompertz and linear closing methods require new_data argument.") }
 
 
   ## Check if there are overlapping data between the model and the user input:
@@ -225,7 +225,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
   # Preventing death probabilities above 1:
   closed = apply(closed, 2, function(x) ifelse(x < 1 - eps, x, 1))
 
-  new_age = 0:max_age
+  new_age = min(fit$info$ages):max_age
   new_len = length(new_age)
   fitted = matrix(NA_real_, nrow = num_sim, ncol = new_len)
   colnames(fitted) = new_age
@@ -254,7 +254,7 @@ dlm_close = function(fit, method = c("linear", "gompertz", "plateau"), x0 = max(
     ret[i, idx_mix] = weights * ret[i, idx_mix] + (1 - weights) * fitted[i, idx_mix]
   }
 
-  return(structure(list(qx = ret,
+  return(structure(list(qx = ret[, (min(fit$info$ages):max_age + 1)],
                         info = list(ages = new_age,
                                     y = full_data),
                         method = method), class = "ClosedDLM"))

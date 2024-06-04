@@ -70,7 +70,7 @@ predict.DLM <- function(object, h, prob = 0.95, ...){
   sim[, 1] <- rt(n, df = 2*aux$alpha)*sqrt(Qt*(aux$beta/aux$alpha)) + c(ft)
 
   if(h > 1) for(k in 2:h){
-    Wt = Ct * (1 - delta) / delta
+    #Wt = Ct
     at = Gt %*% at
     Rt = Gt %*% Rt %*% t(Gt) + Wt
     ft = Ft %*% at
@@ -84,12 +84,15 @@ predict.DLM <- function(object, h, prob = 0.95, ...){
   }
 
   qx_sim = exp(sim)
-  qx_sim[qx_sim < 0] = 0
-  qx_sim[qx_sim > 1] = 1
   qx_fitted = apply(qx_sim, 2, median, na.rm = T)
   qx_lim = apply(qx_sim, 2, quantile, probs = c((1-prob)/2, (1+prob)/2), na.rm = T)
+
   qx_fitted = data.frame(Ages = (fit$info$ages[N]+1):(fit$info$ages[N]+h), qx_fitted = qx_fitted)
-  return(data.frame(age = qx_fitted$Ages, qx.fitted = 1 - exp(-qx_fitted$qx_fitted),
-                    qx.lower = 1 - exp(-qx_lim[1,]), qx.upper = 1 - exp(-qx_lim[2,])))
+  ret = data.frame(age = qx_fitted$Ages, qx.fitted = 1 - exp(-qx_fitted$qx_fitted),
+                   qx.lower = 1 - exp(-qx_lim[1,]), qx.upper = 1 - exp(-qx_lim[2,]))
+  ret[ret[,2:4] < 0,2:4] = 0
+  ret[ret[,2:4] > 1,2:4] = 1
+
+  return(ret)
 }
 
