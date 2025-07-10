@@ -102,6 +102,8 @@ plot(fit2)
 }
 \references{
 Campagnoli, P., Petris, G., and Petrone, S. (2009). \emph{Dynamic linear models with R}. Springer-Verlag New York.
+
+Silva, L. M. F., Figueiredo, L. F. V., Lobo, V. G. R., Fonseca, T. C. O., & Alves, M. B. (2025). \emph{Journal of Statistical Software}. BayesMortalityPlus: A Package in R for Bayesian Mortality Modeling.\url{doi:10.18637/jss.v113.i09}
 }
 \seealso{
 \code{\link[=fitted.DLM]{fitted.DLM()}}, \code{\link[=predict.DLM]{predict.DLM()}}, \code{\link[=plot.DLM]{plot.DLM()}}, \code{\link[=print.DLM]{print.DLM()}} and \code{\link[=summary.DLM]{summary.DLM()}} for \code{DLM} methods to native R functions \code{\link[=fitted]{fitted()}},

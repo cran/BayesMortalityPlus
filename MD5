@@ -1,10 +1,10 @@
-a7e791e00539ced9027ed48b2ee12675 *DESCRIPTION
+2b727d7b0e0a10cbed9fee8a788775fd *DESCRIPTION
 7e16d4297f8de7c161c2700284ffdb90 *NAMESPACE
 a96e779b34ebf2f66c23c9e9db65d414 *R/Heatmap_default.R
 1e17bf82a27fca0eb828f6cb136d7021 *R/PT.R
 0895b66ac106932d0becefacbf476b40 *R/USA.R
-79dd9d22e104c670a413200371111fac *R/blc.R
-980d7ff9aae4bcb20cc91e2b6ed15f98 *R/dlm.R
+4de45df6c045be51135a9d92388c45c2 *R/blc.R
+b28382701cc050da02ad0c6dab1d1f1f *R/dlm.R
 9994e202cf68300396815fdbcac6d6ba *R/dlm_close.R
 ab6e9c59da377fbd71fbc37fc65f970d *R/expectancy_blc.R
 19fe0da1a7032728d583fce6d49546b3 *R/expectancy_default.R
@@ -21,7 +21,7 @@ ffec78a6f2e6d477f2bbe1f23d3a7c99 *R/heatmap_blc.R
 a1ed6b6eac20ecc71a41e6cabcd89bfc *R/heatmap_dlm.R
 866d89471ce5b24bc8d2cf3634410a0f *R/heatmap_hp.R
 a348f21917001330383f1d4e3aa68b3a *R/heatmap_list.R
-cce887d980472fffd26369e713a0f5c7 *R/hp.R
+b8e926908de4ac03bc2a48757ff2c7e4 *R/hp.R
 24e2200c3c7c972b7120a8c133be6ffc *R/hp_binomial.R
 23eb47d7094cbd13b3ebb0bd95badc31 *R/hp_binomial_reduced.R
 8d9bb0fda55c020b7c5500722c1bd2c1 *R/hp_close.R
@@ -54,6 +54,7 @@ f9f0192844e1978e39b4c3b2a2ef18b6 *R/plot_hp.R
 4de8d5f56dcfd6534ba3931d411ea29a *R/summary_hp.R
 f1b2e3ee9c05721011a5221e4b63c105 *data/PT.rda
 46ea62751b7f610fa88f2b9a1bc18ecd *data/USA.rda
+5df1b4ee566a353ca90de018d61ffc42 *inst/CITATION
 5679fe4a925fe895f6e94072741aecd1 *man/Heatmap.BLC.Rd
 b56b4700b61ffb32fdae6069895846c0 *man/Heatmap.DLM.Rd
 5a7298acb183e447e2427642c8a4efe5 *man/Heatmap.HP.Rd
@@ -61,8 +62,8 @@ b56b4700b61ffb32fdae6069895846c0 *man/Heatmap.DLM.Rd
 cedfd320a16f509adc348558dc849fc3 *man/Heatmap.list.Rd
 88086943bcc1028dedaef8c4d86db756 *man/PT.Rd
 9d069a3e4cca8d363b022eff797d9092 *man/USA.Rd
-4144db7bfa7be969bae796ff7f3dbb35 *man/blc.Rd
-89f937ecd32619f2eb40b301c4ad7b1e *man/dlm.Rd
+0f66af862ef54d67dd3d37a2c3ae5625 *man/blc.Rd
+cb8c06c769dbba2f0c111c6536f5f541 *man/dlm.Rd
 e1efdda8a51eab37278c6155d2c58bbe *man/dlm_close.Rd
 970357a28f93e25106a7f6269d526103 *man/expectancy.BLC.Rd
 fb8ef85a09b40eed95125f95aaeb5fbb *man/expectancy.DLM.Rd
@@ -71,7 +72,7 @@ df78e97c60d814fa2a5330515d0197a8 *man/expectancy.Rd
 a8af368d3370d68170a2bd67bfda22dc *man/fitted.BLC.Rd
 ab2c4c7f28d9265d539d323a034a11ad *man/fitted.DLM.Rd
 1547966e6ddf16fbf1377242ecb331de *man/fitted.HP.Rd
-8673370112d89ae71babc6f752e4fd27 *man/hp.Rd
+60477e919b9f277fb1a5c5a9329b922b *man/hp.Rd
 3b156da840f5d3efc8f18898fae7e248 *man/hp_close.Rd
 865dbd8439ff95107883f923f81c81ba *man/hp_mix.Rd
 785dae370453539cec12621d8118b0d1 *man/improvement.Rd

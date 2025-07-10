@@ -1,0 +1,21 @@
+bibentry(bibtype = "Article",
+  title        = "{BayesMortalityPlus}: A Package in {R} for {B}ayesian Mortality Modeling",
+  author       = c(person(given = c("Lucas", "M.", "F."),
+                          family = "Silva"),
+                   person(given = c("Luiz", "F.", "V."),
+                          family = "Figueiredo"),
+                   person(given = c("Viviana", "G.", "R."),
+                          family = "Lobo",
+                          email = "viviana@dme.ufrj.br"),
+                   person(given = c("Thais", "C.", "O."),
+                          family = "Fonseca"),
+                   person(given = c("Mariane", "B."),
+                          family = "Alves")),
+  journal      = "Journal of Statistical Software",
+  year         = "2025",
+  volume       = "113",
+  number       = "9",
+  pages        = "1--49",
+  doi          = "10.18637/jss.v113.i09"
+)
+

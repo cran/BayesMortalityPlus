@@ -125,6 +125,8 @@ plot_chain(fit)
 Dellaportas, P., Smith, A. F., and Stavropoulos, P. (2001). “Bayesian Analysis of Mortality Data.” \emph{Journal of the Royal Statistical Society: Series A (Statistics in Society)} 164 (2). Wiley Online Library: 275–291.
 
 Heligman, Larry, and John H Pollard. (1980). “The Age Pattern of Mortality.” \emph{Journal of the Institute of Actuaries (1886-1994)} 107 (1). JSTOR: 49–80.
+
+Silva, L. M. F., Figueiredo, L. F. V., Lobo, V. G. R., Fonseca, T. C. O., & Alves, M. B. (2025). \emph{Journal of Statistical Software}. BayesMortalityPlus: A Package in R for Bayesian Mortality Modeling.\url{doi:10.18637/jss.v113.i09}
 }
 \seealso{
 \code{\link[=fitted.HP]{fitted.HP()}}, \code{\link[=plot.HP]{plot.HP()}}, \code{\link[=print.HP]{print.HP()}} and \code{\link[=summary.HP]{summary.HP()}} for \code{HP} methods to native R functions \code{\link[=fitted]{fitted()}},

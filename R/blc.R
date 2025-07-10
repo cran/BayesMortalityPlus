@@ -57,6 +57,7 @@
 #'
 #' @references Lee, R. D., & Carter, L. R. (1992). “Modeling and forecasting US mortality.” \emph{Journal of the American statistical association}, 87(419), 659-671.
 #' @references Pedroza, C. (2006). “A Bayesian forecasting model: predicting US male mortality.” \emph{Biostatistics}, 7(4), 530-550.
+#' @references Silva, L. M. F., Figueiredo, L. F. V., Lobo, V. G. R., Fonseca, T. C. O., & Alves, M. B. (2025). \emph{Journal of Statistical Software}. BayesMortalityPlus: A Package in R for Bayesian Mortality Modeling.<doi:10.18637/jss.v113.i09>
 #'
 #' @examples
 #' ## Example of transforming the dataset to fit the function:

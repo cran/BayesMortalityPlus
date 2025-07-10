@@ -65,6 +65,7 @@
 #'
 #' @references Dellaportas, P., Smith, A. F., and Stavropoulos, P. (2001). “Bayesian Analysis of Mortality Data.” \emph{Journal of the Royal Statistical Society: Series A (Statistics in Society)} 164 (2). Wiley Online Library: 275–291.
 #' @references Heligman, Larry, and John H Pollard. (1980). “The Age Pattern of Mortality.” \emph{Journal of the Institute of Actuaries (1886-1994)} 107 (1). JSTOR: 49–80.
+#' @references Silva, L. M. F., Figueiredo, L. F. V., Lobo, V. G. R., Fonseca, T. C. O., & Alves, M. B. (2025). \emph{Journal of Statistical Software}. BayesMortalityPlus: A Package in R for Bayesian Mortality Modeling.<doi:10.18637/jss.v113.i09>
 #'
 #' @examples
 #' ## Importing mortality data from the USA available on the Human Mortality Database (HMD):

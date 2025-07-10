@@ -102,6 +102,8 @@ improvement(fit)
 Lee, R. D., & Carter, L. R. (1992). “Modeling and forecasting US mortality.” \emph{Journal of the American statistical association}, 87(419), 659-671.
 
 Pedroza, C. (2006). “A Bayesian forecasting model: predicting US male mortality.” \emph{Biostatistics}, 7(4), 530-550.
+
+Silva, L. M. F., Figueiredo, L. F. V., Lobo, V. G. R., Fonseca, T. C. O., & Alves, M. B. (2025). \emph{Journal of Statistical Software}. BayesMortalityPlus: A Package in R for Bayesian Mortality Modeling.\url{doi:10.18637/jss.v113.i09}
 }
 \seealso{
 \code{\link[=fitted.BLC]{fitted.BLC()}}, \code{\link[=plot.BLC]{plot.BLC()}}, \code{\link[=print.BLC]{print.BLC()}} and \code{\link[=predict.BLC]{predict.BLC()}} for \code{BLC} methods to native R functions \code{\link[=fitted]{fitted()}},
